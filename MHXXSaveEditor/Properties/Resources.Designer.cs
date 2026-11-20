@@ -63,6 +63,16 @@ namespace MHXXSaveEditor.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] EmptySlotMHGU {
+            get {
+                object obj = ResourceManager.GetObject("EmptySlotMHGU", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] CleanSave {
             get {
                 object obj = ResourceManager.GetObject("CleanSave", resourceCulture);

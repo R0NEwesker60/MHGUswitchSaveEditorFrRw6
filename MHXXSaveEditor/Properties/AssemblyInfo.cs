@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MHXXSaveEditor")]
-[assembly: AssemblyDescription("Save Editor for MHXX (3DS/2DS, not Switch)")]
+[assembly: AssemblyTitle("MHGUswitchSaveEditorFrRw6")]
+[assembly: AssemblyDescription("Save editor for Monster Hunter Generations Ultimate (Switch) - French version V 02.33, based on MHXXSaveEditor")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MHXXSaveEditor")]
+[assembly: AssemblyProduct("MHGUswitchSaveEditorFrRw6")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("Ukee")]
 [assembly: AssemblyCulture("")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("2.37.0.0")]
+[assembly: AssemblyFileVersion("2.37.0.0")]

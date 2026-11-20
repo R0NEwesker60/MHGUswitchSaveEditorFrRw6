@@ -3,6 +3,7 @@
 // Last but not least, thanks to GBATemp's few threads on MHX/MHGen/MHXX save editing
 // This editor was made by Ukee from GBATemp https://gbatemp.net/threads/release-mhxx-save-editor.481210/
 // The source code can be found @ https://github.com/mineminemine/MHXXSaveEditor
+// Modifié le 14 novembre 2026 (V2 : appel AddV2Menus dans le constructeur).
 
 using MHXXSaveEditor.Data;
 using MHXXSaveEditor.Forms;
@@ -24,6 +25,10 @@ namespace MHXXSaveEditor
             InitializeComponent();
             Loc.Apply(this);
             Loc.AddLanguageMenu(menuStripMain);
+            AddV2Menus(); // V2 : menu Coffre graphique et mode sombre (voir MainForm.V2.cs)
+            AddSaveTopButton(); // V36 : retire Modifier et Convertir de la barre, ajoute le bouton Enregistrer à droite de Fichier (voir MainForm.V2.TopMenu.cs)
+            HookDragDrop(this); // V34 : glisser-déposer d'un fichier de sauvegarde (voir MainForm.V2.DragDrop.cs)
+            editToolStripMenuItem.DropDownItems.Clear(); // V35 : le menu Modifier est vidé (le bouton reste pour plus tard ; le code des anciennes options est conservé dans ce fichier)
             this.Text = Constants.EDITOR_VERSION; // Changes app title
         }
 
@@ -33,6 +38,7 @@ namespace MHXXSaveEditor
         byte[] saveFileRaw;
         readonly int SWITCH_SAVE_SIZE = 4726152 + 36;
         readonly int MHGU_SAVE_SIZE = 4726152 + 432948;
+        const int MHGU_SLOT_SIZE = 1177796; // taille d'un emplacement de personnage MHGU (écart entre deux décalages d'emplacement)
         bool switchMode = false; //true is switch mode
         int currentPlayer, itemSelectedSlot;
         public int equipSelectedSlot, palicoEqpSelectedSlot;
@@ -40,13 +46,7 @@ namespace MHXXSaveEditor
 
         private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            toolStripMenuItemSaveSlot1.Enabled = false;
-            toolStripMenuItemSaveSlot2.Enabled = false;
-            toolStripMenuItemSaveSlot3.Enabled = false;
-            slot1ToolStripMenuItem.Enabled = false;
-            slot2ToolStripMenuItem.Enabled = false;
-            slot3ToolStripMenuItem.Enabled = false;
-            convertToolStripMenuItem.Enabled = false;
+            if (!ConfirmUnsaved("loading another save", "charger une autre sauvegarde")) return;
 
             OpenFileDialog ofd = new OpenFileDialog
             {
@@ -59,27 +59,43 @@ namespace MHXXSaveEditor
                 ofd.Dispose();
                 return;
             }
-            Cursor.Current = Cursors.WaitCursor;
-            filePath = ofd.FileName;
-            Text = string.Format("{0} [{1}]", Constants.EDITOR_VERSION, ofd.SafeFileName); // Changes app title
-            saveFileRaw = File.ReadAllBytes(ofd.FileName); // Read all bytes from file into memory buffer
-            
+            string chosenPath = ofd.FileName;
+            string chosenName = ofd.SafeFileName;
             ofd.Dispose();
+            LoadSaveFile(chosenPath, chosenName);
+        }
+
+        // Charge un fichier de sauvegarde dans l'éditeur (aussi utilisé par « Restaurer une copie »).
+        public void LoadSaveFile(string path, string safeName)
+        {
+            toolStripMenuItemSaveSlot1.Enabled = false;
+            toolStripMenuItemSaveSlot2.Enabled = false;
+            toolStripMenuItemSaveSlot3.Enabled = false;
+            slot1ToolStripMenuItem.Enabled = false;
+            slot2ToolStripMenuItem.Enabled = false;
+            slot3ToolStripMenuItem.Enabled = false;
+            convertToolStripMenuItem.Enabled = false;
+
+            Cursor.Current = Cursors.WaitCursor;
+            filePath = path;
+            Text = Constants.EDITOR_VERSION; // titre : juste le nom de l'application
+            detectedText = "";
+            saveFileRaw = File.ReadAllBytes(path); // Read all bytes from file into memory buffer
 
             if (saveFileRaw.Length == 4726152)
             {
-                Loc.Show($"Detected a 3DS save", "3DS");
+                detectedText = RomfsConfig.L("3DS save detected", "Sauvegarde 3DS détectée"); // affiché dans l'onglet Général, sans fenêtre à fermer
                 toSwitchToolStripMenuItem.Enabled = true;
                 switchMode = false;
             }
             else if (saveFileRaw.Length == SWITCH_SAVE_SIZE)
             {
-                Loc.Show($"Detected a MHXX Switch save", "Switch");
+                detectedText = RomfsConfig.L("MHXX Switch save detected", "Sauvegarde MHXX Switch détectée");
                 switchMode = true;
             }
             else if (saveFileRaw.Length == MHGU_SAVE_SIZE)
             {
-                Loc.Show($"Detected a MHGU Switch save", "Switch");
+                detectedText = RomfsConfig.L("MHGU Switch save detected", "Sauvegarde MHGU Switch détectée");
                 switchMode = true;
             }
             else
@@ -88,6 +104,7 @@ namespace MHXXSaveEditor
                 return;
             }
 
+            MHXXSaveEditor.Util.ThemeSettings.AddRecent(path); // fichiers récents
             SplashScreen.ShowSplashScreen();
             if(switchMode)
             {
@@ -98,6 +115,7 @@ namespace MHXXSaveEditor
             }
 
             // To see which character slots are enabled
+            currentPlayer = 0;
             if (saveFile[4] == 1) // First slot
             {
                 currentPlayer = 1;
@@ -123,6 +141,10 @@ namespace MHXXSaveEditor
                 toolStripMenuItemSaveSlot3.Enabled = true;
                 slot3ToolStripMenuItem.Enabled = true;
             }
+            toolStripMenuItemSaveSlot1.Checked = currentPlayer == 1;
+            toolStripMenuItemSaveSlot2.Checked = currentPlayer == 2;
+            toolStripMenuItemSaveSlot3.Checked = currentPlayer == 3;
+            UpdateSlotMenuTexts(); // pseudo de chaque emplacement dans les menus
             if (saveFile[4] == 0 && saveFile[5] == 0 && saveFile[6] == 0)
             {
                 Loc.Show("No existing save slots used, please make one in-game first.", "Error");
@@ -141,6 +163,7 @@ namespace MHXXSaveEditor
             ext.GetInfo(saveFile, currentPlayer, player);
 
             LoadSave(); // Load save file data into editor
+            MarkClean();
             Cursor.Current = Cursors.Default;
             SplashScreen.CloseForm();
         }
@@ -149,6 +172,7 @@ namespace MHXXSaveEditor
         {
             if(currentPlayer != 1)
             {
+                if (!ConfirmUnsaved("switching character", "changer de personnage")) { UpdateSlotMenuTexts(); return; }
                 currentPlayer = 1;
                 toolStripMenuItemSaveSlot1.Checked = true;
                 toolStripMenuItemSaveSlot2.Checked = false;
@@ -157,6 +181,8 @@ namespace MHXXSaveEditor
                 var ext = new DataExtractor();
                 ext.GetInfo(saveFile, currentPlayer, player);
                 LoadSave();
+                MarkClean();
+                UpdateSlotMenuTexts();
             }
         }
 
@@ -164,6 +190,7 @@ namespace MHXXSaveEditor
         {
             if (currentPlayer != 2)
             {
+                if (!ConfirmUnsaved("switching character", "changer de personnage")) { UpdateSlotMenuTexts(); return; }
                 currentPlayer = 2;
                 toolStripMenuItemSaveSlot1.Checked = false;
                 toolStripMenuItemSaveSlot2.Checked = true;
@@ -172,6 +199,8 @@ namespace MHXXSaveEditor
                 var ext = new DataExtractor();
                 ext.GetInfo(saveFile, currentPlayer, player);
                 LoadSave();
+                MarkClean();
+                UpdateSlotMenuTexts();
             }
         }
 
@@ -179,6 +208,7 @@ namespace MHXXSaveEditor
         {
             if (currentPlayer != 3)
             {
+                if (!ConfirmUnsaved("switching character", "changer de personnage")) { UpdateSlotMenuTexts(); return; }
                 currentPlayer = 3;
                 toolStripMenuItemSaveSlot1.Checked = false;
                 toolStripMenuItemSaveSlot2.Checked = false;
@@ -187,23 +217,25 @@ namespace MHXXSaveEditor
                 var ext = new DataExtractor();
                 ext.GetInfo(saveFile, currentPlayer, player);
                 LoadSave();
+                MarkClean();
+                UpdateSlotMenuTexts();
             }
         }
 
         private void SaveToolStripMenuItemSave_Click(object sender, EventArgs e)
         {
             PackSaveFile();
-            if(switchMode)
-            {
-                saveFile = TransformToSwitchFormat();
-            }
-            File.WriteAllBytes(filePath, saveFile);
+            // On écrit une copie avec l'en-tête Switch ; 'saveFile' reste sans en-tête (sinon un 2e enregistrement décalerait tout).
+            byte[] output = switchMode ? TransformToSwitchFormat() : saveFile;
+            if (!BackupManager.Backup(this, filePath)) return; // copie de sécurité de l'ancienne version
+            SafeFile.WriteAllBytes(filePath, output);
+            MarkClean();
             Loc.Show("File saved", "Saved !");
         }
 
         private byte[] TransformToSwitchFormat()
         {
-            byte[] switchSaveFile = new byte[MHGU_SAVE_SIZE];
+            byte[] switchSaveFile = new byte[saveFileRaw.Length]; // même taille que le fichier d'origine
             byte[] switchHeader = saveFileRaw.Take(36).ToArray();
             switchHeader.CopyTo(switchSaveFile, 0);
             saveFile.CopyTo(switchSaveFile, 36);
@@ -212,7 +244,52 @@ namespace MHXXSaveEditor
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Loc.Show("Made by Dawnshifter based on work of Ukee for GBATemp\nBased off APM's MHX/MHGen Save Editor\nAlso thanks to Seth VanHeulen for the Save File structure\nAnd some MHX/MHGen/MHXX hex editing threads in GBATemp", "About");
+            string text = MHXXSaveEditor.Util.RomfsConfig.L(
+                Constants.EDITOR_NAME + " V " + Constants.EDITOR_VERSION_NUMBER + " - improved French version of MHXXSaveEditor (V2)\n" +
+                "By R0NEwesker60 (RW6), based on Dawnshifter's MHXXSwitchSaveEditor, itself based on mineminemine's MHXXSaveEditor.\n" +
+                "Thanks to Ukee (GBAtemp), APM (MHX/MHGen Save Editor), Seth VanHeulen (save file structure) and the MHX/MHGen/MHXX hex editing threads on GBAtemp.\n\n" +
+                "Added in this version:\n" +
+                "- French and English interface, with the French names of MHGU\n" +
+                "- Three graphic chests (items, equipment, Palico equipment), with normal or HD icons\n" +
+                "- Optional HD icons (texture pack), read in place from your own ROMFS folder\n" +
+                "- Advanced search: by ID and by French and English names at the same time\n" +
+                "- Filters by category and by rarity\n" +
+                "- Dark theme, resizable window, adjustable zoom, colours on the menus and tabs (can be turned off)\n" +
+                "- Equipment editable straight from the grid\n" +
+                "- Safe writing: a save is written to a temporary file first, then swapped in, so a crash cannot corrupt it\n" +
+                "- Automatic safety backup of the save, one folder per copy, with notes (note.txt), restore from a list of copies, backup folder names you can change\n" +
+                "- Transfer of slots between two saves (A / B): swap, copy or cut, with its own safety copies and an automatic note\n" +
+                "- Recent files, favorite files and three destination buttons you can rename\n" +
+                "- Drag and drop a save file onto the window to open it\n" +
+                "- A Save button right next to File (same as File > Save), save format detection (3DS, MHXX Switch, MHGU Switch) shown on the General tab\n" +
+                "- Slot management: delete, swap and duplicate characters, slot buttons on the General tab (coloured by hunter rank)\n" +
+                "- Warning before losing unsaved changes, Ctrl+S / Ctrl+O shortcuts\n" +
+                "- Optional weapon transmogrification (cheat codes)\n" +
+                "- Fixes for minor and major bugs\n\n" +
+                "Licence: GNU GPL v3. Bugs and feedback: open an issue on the RW6 GitHub page.",
+                Constants.EDITOR_NAME + " V " + Constants.EDITOR_VERSION_NUMBER + " - version française améliorée de MHXXSaveEditor (V2)\n" +
+                "Par R0NEwesker60 (RW6), d'après le MHXXSwitchSaveEditor de Dawnshifter, lui-même basé sur le MHXXSaveEditor de mineminemine.\n" +
+                "Merci à Ukee (GBAtemp), APM (éditeur MHX/MHGen), Seth VanHeulen (structure du fichier de sauvegarde) et aux sujets de modification hexadécimale MHX/MHGen/MHXX de GBAtemp.\n\n" +
+                "Ajouts de cette version :\n" +
+                "- Interface en français et en anglais, avec les noms français de MHGU\n" +
+                "- Trois coffres graphiques (objets, équipement, équipement Palico), avec icônes normales ou HD\n" +
+                "- Icônes HD en option (pack de textures), lues sur place dans ton propre dossier ROMFS\n" +
+                "- Recherche avancée : par ID et par noms français et anglais en même temps\n" +
+                "- Filtres par catégorie et par rareté\n" +
+                "- Thème sombre, fenêtre redimensionnable, zoom réglable, couleurs sur les menus et les onglets (désactivables)\n" +
+                "- Équipement modifiable directement depuis la grille\n" +
+                "- Écriture sûre : une sauvegarde est d'abord écrite dans un fichier temporaire, puis mise à la place de l'ancienne, donc un plantage ne peut pas l'abîmer\n" +
+                "- Sauvegarde de sécurité automatique, un dossier par copie, avec des notes (note.txt), restauration depuis une liste de copies, noms des dossiers de copies modifiables\n" +
+                "- Transfert d'emplacements entre deux sauvegardes (A / B) : échanger, copier ou couper, avec ses propres copies de sécurité et une note automatique\n" +
+                "- Fichiers récents, fichiers favoris et trois boutons de destination que tu peux renommer\n" +
+                "- Glisser-déposer un fichier de sauvegarde sur la fenêtre pour l'ouvrir\n" +
+                "- Un bouton Enregistrer juste à droite de Fichier (comme Fichier > Enregistrer), format de la sauvegarde (3DS, MHXX Switch, MHGU Switch) affiché dans l'onglet Général\n" +
+                "- Gestion des emplacements : supprimer, échanger et dupliquer des personnages, boutons d'emplacement dans l'onglet Général (colorés selon le rang de chasseur)\n" +
+                "- Avertissement avant de perdre des modifications non enregistrées, raccourcis Ctrl+S / Ctrl+O\n" +
+                "- Transmogrification des armes en option (codes de triche)\n" +
+                "- Corrections de bugs mineurs et majeurs\n\n" +
+                "Licence : GNU GPL v3. Bugs et retours : créez une « issue » sur la page GitHub de RW6.");
+            MessageBox.Show(this, text, MHXXSaveEditor.Util.RomfsConfig.L("About", "À propos"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         public void LoadSave()
@@ -706,7 +783,7 @@ namespace MHXXSaveEditor
             else
             {
                 ComboBox cb = (ComboBox)sender;
-                if (!cb.Focused)
+                if (!cb.Focused && !BypassFocus)
                     return;
 
                 comboBoxEquipName.Items.Clear();
@@ -843,7 +920,9 @@ namespace MHXXSaveEditor
                 {
                     player.EquipmentInfo[(equipSelectedSlot * 36) + a] = 0; // Clears everything to 0
                 }
-                player.EquipmentInfo[(equipSelectedSlot * 36) + 2] = 1; // Changes Eqp ID to 1, being the first selected eqp in that eqp type
+                // Numéro 1 = premier équipement de ce type. Pour « (None) », on laisse 0 (sinon un « 1 » restait dans la case).
+                if (comboBoxEquipType.SelectedIndex != 0 && comboBoxEquipType.SelectedIndex != 12)
+                    player.EquipmentInfo[(equipSelectedSlot * 36) + 2] = 1;
             }
         }
 
@@ -854,7 +933,7 @@ namespace MHXXSaveEditor
             else
             {
                 ComboBox cb = (ComboBox)sender;
-                if (!cb.Focused)
+                if (!cb.Focused && !BypassFocus)
                 {
                     return;
                 }
@@ -872,7 +951,7 @@ namespace MHXXSaveEditor
             else
             {
                 ComboBox cb = (ComboBox)sender;
-                if (!cb.Focused)
+                if (!cb.Focused && !BypassFocus)
                 {
                     return;
                 }
@@ -890,7 +969,7 @@ namespace MHXXSaveEditor
             else
             {
                 ComboBox cb = (ComboBox)sender;
-                if (!cb.Focused)
+                if (!cb.Focused && !BypassFocus)
                 {
                     return;
                 }
@@ -998,7 +1077,7 @@ namespace MHXXSaveEditor
             else
             {
                 ComboBox cb = (ComboBox)sender;
-                if (!cb.Focused)
+                if (!cb.Focused && !BypassFocus)
                 {
                     return;
                 }
@@ -1087,7 +1166,7 @@ namespace MHXXSaveEditor
             else
             {
                 ComboBox cb = (ComboBox)sender;
-                if (!cb.Focused)
+                if (!cb.Focused && !BypassFocus)
                 {
                     return;
                 }
@@ -1184,13 +1263,12 @@ namespace MHXXSaveEditor
             savefile.FileName = "system";
             savefile.Filter = "All files (*.*)|*.*";
 
-            if (switchMode)
-            {
-                saveFile = TransformToSwitchFormat();
-            }
+            byte[] output = switchMode ? TransformToSwitchFormat() : saveFile;
 
-            if (savefile.ShowDialog() == DialogResult.OK)
-                File.WriteAllBytes(savefile.FileName, saveFile);
+            if (savefile.ShowDialog() != DialogResult.OK) return;
+            if (!BackupManager.Backup(this, savefile.FileName)) return; // si on écrase un fichier existant
+            SafeFile.WriteAllBytes(savefile.FileName, output);
+            MarkClean();
             Loc.Show("File saved", "Saved !");
         }
 
@@ -1257,55 +1335,101 @@ namespace MHXXSaveEditor
 
         private void Slot1ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (Loc.Show("Are you sure you want to delete this save slot?", "Delete save slot 1", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                DeleteSaveSlot(1);
+            DeleteSaveSlot(1); // la confirmation est demandée dans DeleteSaveSlot
         }
 
         private void Slot2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (Loc.Show("Are you sure you want to delete this save slot?", "Delete save slot 2", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                DeleteSaveSlot(2);
+            DeleteSaveSlot(2); // la confirmation est demandée dans DeleteSaveSlot
         }
 
         private void Slot3ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (Loc.Show("Are you sure you want to delete this save slot?", "Delete save slot 3", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                DeleteSaveSlot(3);
+            DeleteSaveSlot(3); // la confirmation est demandée dans DeleteSaveSlot
         }
 
+        // Supprime un emplacement de personnage (sauvegardes MHGU Switch seulement).
+        // L'emplacement est remplacé par un emplacement vide fabriqué par le jeu lui-même (modèle embarqué) et son drapeau
+        // « emplacement utilisé » passe à 0. On travaille sur le fichier tel qu'il est sur le disque, en gardant son en-tête Switch.
         private void DeleteSaveSlot(int slotNumber)
         {
-            int theOffset;
+            string title = MHXXSaveEditor.Util.RomfsConfig.L("Delete save slot " + slotNumber, "Supprimer l'emplacement " + slotNumber);
+            if (!ConfirmUnsaved("deleting a slot", "supprimer un emplacement")) return;
+            try
+            {
+                if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+                byte[] raw = File.ReadAllBytes(filePath);
+                if (raw.Length != MHGU_SAVE_SIZE)
+                {
+                    MessageBox.Show(this,
+                        MHXXSaveEditor.Util.RomfsConfig.L("Deleting a slot is only available for MHGU Switch saves. Nothing was changed.",
+                                                          "La suppression d'un emplacement n'existe que pour les sauvegardes MHGU Switch. Rien n'a été modifié."),
+                        title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                byte[] template = Properties.Resources.EmptySlotMHGU;
+                if (template == null || template.Length != MHGU_SLOT_SIZE)
+                {
+                    MessageBox.Show(this, "Empty slot template missing / modèle d'emplacement vide absent. Nothing was changed.", title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                int flagIndex = 36 + 4 + (slotNumber - 1);
+                int offPos = 36 + 0x10 + 4 * (slotNumber - 1);
+                if (raw[flagIndex] != 1)
+                {
+                    MessageBox.Show(this,
+                        MHXXSaveEditor.Util.RomfsConfig.L("This slot is already empty.", "Cet emplacement est déjà vide."),
+                        title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                int slotOffset = BitConverter.ToInt32(raw, offPos); // décalage dans le corps (après les 36 octets d'en-tête)
+                int abs = 36 + slotOffset;
+                if (slotOffset < 0x30 || abs < 0 || abs + MHGU_SLOT_SIZE > raw.Length)
+                {
+                    MessageBox.Show(this,
+                        MHXXSaveEditor.Util.RomfsConfig.L("Unexpected save structure. Nothing was changed.", "Structure de sauvegarde inattendue. Rien n'a été modifié."),
+                        title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                string charName = Encoding.UTF8.GetString(raw, abs, 32).Split('\0')[0];
+                if (MessageBox.Show(this,
+                        MHXXSaveEditor.Util.RomfsConfig.L("Delete slot " + slotNumber + " (" + charName + ")?\n\nThis cannot be undone, except with the safety copy made just before. Changes not yet saved in the editor will be lost.",
+                                                          "Supprimer l'emplacement " + slotNumber + " (" + charName + ") ?\n\nC'est définitif, sauf avec la copie de sécurité faite juste avant. Les modifications non enregistrées dans l'éditeur seront perdues."),
+                        title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
 
-            if (slotNumber == 1)
-            {
-                string firstSlot = saveFile[0x13].ToString("X2") + saveFile[0x12].ToString("X2") + saveFile[0x11].ToString("X2") + saveFile[0x10].ToString("X2");
-                theOffset = int.Parse(firstSlot, System.Globalization.NumberStyles.HexNumber);
-                saveFile[4] = 0;
+                Array.Copy(template, 0, raw, abs, MHGU_SLOT_SIZE);
+                raw[flagIndex] = 0;
+
+                // Copie de sécurité obligatoire avant d'écrire, même si la copie automatique est coupée.
+                bool was = MHXXSaveEditor.Util.ThemeSettings.BackupOn;
+                MHXXSaveEditor.Util.ThemeSettings.BackupOn = true;
+                bool okBackup;
+                try { okBackup = BackupManager.Backup(this, filePath); }
+                finally { MHXXSaveEditor.Util.ThemeSettings.BackupOn = was; }
+                if (!okBackup) return;
+
+                SafeFile.WriteAllBytes(filePath, raw);
             }
-            else if (slotNumber == 2)
+            catch (Exception ex)
             {
-                string secondSlot = saveFile[0x17].ToString("X2") + saveFile[0x16].ToString("X2") + saveFile[0x15].ToString("X2") + saveFile[0x14].ToString("X2");
-                theOffset = int.Parse(secondSlot, System.Globalization.NumberStyles.HexNumber);
-                saveFile[5] = 0;
-            }
-            else
-            {
-                string thirdSlot = saveFile[0x21].ToString("X2") + saveFile[0x20].ToString("X2") + saveFile[0x19].ToString("X2") + saveFile[0x18].ToString("X2");
-                theOffset = int.Parse(thirdSlot, System.Globalization.NumberStyles.HexNumber);
-                saveFile[6] = 0;
+                MessageBox.Show(this, ex.Message, title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
 
-            Array.Copy(Properties.Resources.CleanSave, 0, saveFile, theOffset, Properties.Resources.CleanSave.Length);
-            File.WriteAllBytes(filePath, saveFile);
-            Loc.Show("The save slot has been deleted", Loc.F("Save slot {0} deleted", slotNumber));
-            Loc.Show("This program will now restart");
-            Application.Restart();
+            LoadSaveFile(filePath, Path.GetFileName(filePath)); // l'éditeur relit le fichier tel qu'il est maintenant
+            if (saveFile != null && saveFile[4] == 0 && saveFile[5] == 0 && saveFile[6] == 0)
+            {
+                // Plus aucun personnage : on empêche d'enregistrer l'ancien contenu encore en mémoire par-dessus.
+                saveToolStripMenuItemSave.Enabled = false;
+                saveAsToolStripMenuItem.Enabled = false;
+                tabControlMain.Enabled = false;
+                editToolStripMenuItem.Enabled = false;
+            }
         }
 
         private void ButtonTransmogrify_Click(object sender, EventArgs e)
         {
-            Transmogrify transmogrifyEquip = new Transmogrify(this, listViewEquipment.SelectedItems[0].SubItems[2].Text, listViewEquipment.SelectedItems[0].SubItems[1].Text, Convert.ToInt32(labelTransmogID.Text));
+            Transmogrify transmogrifyEquip = new Transmogrify(this, listViewEquipment.SelectedItems[0].SubItems[2].Text, listViewEquipment.SelectedItems[0].SubItems[1].Text, Convert.ToInt32(labelTransmogID.Text), comboBoxEquipType.SelectedIndex);
             if (transmogrifyEquip.ShowDialog() == DialogResult.OK)
             {
                 int transmogID = Convert.ToInt32(player.EquipmentInfo[(equipSelectedSlot * 36) + 5].ToString("X2") + player.EquipmentInfo[(equipSelectedSlot * 36) + 4].ToString("X2"), 16);
@@ -1486,7 +1610,7 @@ namespace MHXXSaveEditor
             Cursor.Current = Cursors.WaitCursor;
             SplashScreen.ShowSplashScreen();
             filePath = ofd.FileName;
-            Text = string.Format("{0} [{1}]", Constants.EDITOR_VERSION, ofd.SafeFileName); // Changes app title
+            Text = Constants.EDITOR_VERSION; // Changes app title
             byte[] _saveFileRaw = File.ReadAllBytes(ofd.FileName); // Read all bytes from file into memory buffer
 
             ofd.Dispose();
@@ -1531,7 +1655,7 @@ namespace MHXXSaveEditor
             Cursor.Current = Cursors.WaitCursor;
             SplashScreen.ShowSplashScreen();
             filePath = ofd.FileName;
-            Text = string.Format("{0} [{1}]", Constants.EDITOR_VERSION, ofd.SafeFileName); // Changes app title
+            Text = Constants.EDITOR_VERSION; // Changes app title
             byte[] mhxxFile = File.ReadAllBytes(ofd.FileName); // Read all bytes from file into memory buffer
 
             ofd.Dispose();
@@ -1552,7 +1676,7 @@ namespace MHXXSaveEditor
             Cursor.Current = Cursors.WaitCursor;
             SplashScreen.ShowSplashScreen();
             filePath = ofd.FileName;
-            Text = string.Format("{0} [{1}]", Constants.EDITOR_VERSION, ofd.SafeFileName); // Changes app title
+            Text = Constants.EDITOR_VERSION; // Changes app title
             byte[] MHGU = File.ReadAllBytes(ofd.FileName); // Read all bytes from file into memory buffer
 
             ofd.Dispose();
@@ -1571,7 +1695,8 @@ namespace MHXXSaveEditor
                 MHGU[i] = mhxxFile[i];
             }
 
-            File.WriteAllBytes(filePath, MHGU);
+            if (!BackupManager.Backup(this, filePath)) return;
+            SafeFile.WriteAllBytes(filePath, MHGU);
             Loc.Show("File saved", "Saved !");
 
             Loc.Show($"You are now editing the switch version of this save", "Conversion complete");
@@ -1588,7 +1713,7 @@ namespace MHXXSaveEditor
             else
             {
                 ListView ls = (ListView)sender;
-                if (!ls.Focused)
+                if (!ls.Focused && !listSelectBypass)
                 {
                     return;
                 }
@@ -1641,7 +1766,7 @@ namespace MHXXSaveEditor
             else
             {
                 ListView ls = (ListView)sender;
-                if (!ls.Focused)
+                if (!ls.Focused && !listSelectBypass)
                 {
                     return;
                 }
@@ -1681,7 +1806,7 @@ namespace MHXXSaveEditor
                     comboBoxEquipDeco3.Enabled = true;
                     buttonEditKinsect.Enabled = true;
                     buttonEditTalisman.Enabled = false;
-                    buttonTransmogrify.Enabled = false;
+                    buttonTransmogrify.Enabled = MHXXSaveEditor.Util.ThemeSettings.WeaponTransmog;
                     numericUpDownEquipLevel.Enabled = true;
                 }
                 else if (comboBoxEquipType.SelectedIndex == 6)
@@ -1714,7 +1839,7 @@ namespace MHXXSaveEditor
                     comboBoxEquipDeco3.Enabled = true;
                     buttonEditKinsect.Enabled = false;
                     buttonEditTalisman.Enabled = false;
-                    buttonTransmogrify.Enabled = false;
+                    buttonTransmogrify.Enabled = MHXXSaveEditor.Util.ThemeSettings.WeaponTransmog;
                     numericUpDownEquipLevel.Enabled = true;
                 }
 

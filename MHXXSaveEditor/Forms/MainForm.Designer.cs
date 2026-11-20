@@ -69,7 +69,7 @@
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.goToMainThreadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.visitGithubPageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tabControlMain = new System.Windows.Forms.TabControl();
+            this.tabControlMain = new MHXXSaveEditor.Util.ThemedTabControl();
             this.generalTab = new System.Windows.Forms.TabPage();
             this.buttonEditGuildCard = new System.Windows.Forms.Button();
             this.buttonEditShoutouts = new System.Windows.Forms.Button();
@@ -536,7 +536,7 @@
             // 
             this.visitGithubPageToolStripMenuItem.Name = "visitGithubPageToolStripMenuItem";
             this.visitGithubPageToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
-            this.visitGithubPageToolStripMenuItem.Text = "Visit Github page";
+            this.visitGithubPageToolStripMenuItem.Text = "Visit Github page (original)";
             this.visitGithubPageToolStripMenuItem.Click += new System.EventHandler(this.VisitGithubPageToolStripMenuItem_Click);
             // 
             // tabControlMain
@@ -2047,7 +2047,7 @@
         private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItemSave;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
-        private System.Windows.Forms.TabControl tabControlMain;
+        private MHXXSaveEditor.Util.ThemedTabControl tabControlMain;
         private System.Windows.Forms.TabPage generalTab;
         private System.Windows.Forms.TabPage playerTab;
         private System.Windows.Forms.TabPage equipTab;

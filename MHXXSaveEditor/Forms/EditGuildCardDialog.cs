@@ -14,6 +14,8 @@ namespace MHXXSaveEditor.Forms
         public EditGuildCardDialog(MainForm mainForm)
         {
             InitializeComponent();
+            MHXXSaveEditor.Util.ThemeSettings.ApplyZoom(this);
+            if (MHXXSaveEditor.Util.ThemeSettings.Dark) MHXXSaveEditor.Util.ThemeSettings.Apply(this);
             Loc.Apply(this);
             MainForm = mainForm;
             LoadGeneral();

@@ -15,6 +15,8 @@ namespace MHXXSaveEditor.Forms
         public EditPalicoDialog(MainForm mainForm, string palicoName, int selectedSlot)
         {
             InitializeComponent();
+            MHXXSaveEditor.Util.ThemeSettings.ApplyZoom(this);
+            if (MHXXSaveEditor.Util.ThemeSettings.Dark) MHXXSaveEditor.Util.ThemeSettings.Apply(this);
             Loc.Apply(this);
             this.mainForm = mainForm;
             selectedPalico = selectedSlot;

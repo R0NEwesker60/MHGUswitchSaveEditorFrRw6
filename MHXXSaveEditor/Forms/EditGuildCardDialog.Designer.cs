@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabControl1 = new MHXXSaveEditor.Util.ThemedTabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.labelConvTime = new System.Windows.Forms.Label();
             this.textBoxGCName = new System.Windows.Forms.TextBox();
@@ -856,7 +856,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TabControl tabControl1;
+        private MHXXSaveEditor.Util.ThemedTabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TextBox textBoxGCName;
         private System.Windows.Forms.Label label4;

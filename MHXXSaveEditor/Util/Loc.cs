@@ -1,6 +1,6 @@
 ﻿// MHXXSwitchSaveEditor – version française (modifiée). Licence : GNU GPL v3 (voir LICENSE).
 // Basé sur MHXXSwitchSaveEditor 420.69 (Dawnshifter), lui-même basé sur MHXXSaveEditor (mineminemine).
-// Fichier ajouté lors de la traduction française, le 12 novembre 2026.
+// Fichier ajouté lors de la traduction française, le 12 novembre 2026. Modifié le 14 novembre 2026 (V2 : noms bilingues pour la recherche).
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -141,6 +141,7 @@ namespace MHXXSaveEditor
             { "About", "À propos" },
             { "Visit main thread", "Visiter le sujet principal" },
             { "Visit Github page", "Visiter la page GitHub" },
+            { "Visit Github page (original)", "Visiter la page GitHub (original)" },
             { "Edit Guild Card", "Modifier la carte de chasseur" },
             { "Edit Shoutouts", "Annonces" },
             { "Play Time (sec)", "Temps de jeu (sec)" },
@@ -308,11 +309,13 @@ namespace MHXXSaveEditor
                 }
             }
             catch (Exception) { }
+            Data.NameCatalog.CaptureEnglish(); // V2 : garde les noms d'objets anglais pour la recherche bilingue
             if (French)
             {
                 string[] enTypes = (string[])Data.GameConstants.EquipmentTypes.Clone();
                 string[] enPalico = (string[])Data.GameConstants.PalicoEquip.Clone();
                 Data.FrenchNames.Apply();
+                Data.NameCatalog.CaptureFrench();
                 for (int i = 0; i < enTypes.Length; i++) frToEn[Data.GameConstants.EquipmentTypes[i]] = enTypes[i];
                 for (int i = 0; i < enPalico.Length; i++) frToEn[Data.GameConstants.PalicoEquip[i]] = enPalico[i];
             }
@@ -417,6 +420,8 @@ namespace MHXXSaveEditor
             frItem.Click += delegate { ChangeLanguage(true); };
             root.DropDownItems.Add(en);
             root.DropDownItems.Add(frItem);
+            MHXXSaveEditor.Util.MenuChecks.Install(en);
+            MHXXSaveEditor.Util.MenuChecks.Install(frItem);
             menu.Items.Add(root);
         }
 

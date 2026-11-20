@@ -8,14 +8,29 @@ namespace MHXXSaveEditor.Forms
     {
         private MainForm mainForm;
         string eqpType;
-        public Transmogrify(MainForm mainForm, string eqpName, string eqpType, int eqpID)
+        public Transmogrify(MainForm mainForm, string eqpName, string eqpType, int eqpID, int typeIndex = -1)
         {
             InitializeComponent();
+            MHXXSaveEditor.Util.ThemeSettings.ApplyZoom(this);
+            if (MHXXSaveEditor.Util.ThemeSettings.Dark) MHXXSaveEditor.Util.ThemeSettings.Apply(this);
             Loc.Apply(this);
             this.mainForm = mainForm;
             eqpType = Loc.EnType(eqpType);
             this.eqpType = eqpType;
             Text = Loc.F("Transmogrifying - {0}", eqpName);
+
+            // Armes (possible seulement avec des codes de triche) : l'identifiant de transmogrification = celui de l'arme.
+            if (typeIndex >= 7 && typeIndex <= 21 && typeIndex != 12)
+            {
+                string[] wn = NameCatalog.NamesForType(typeIndex);
+                if (wn != null)
+                {
+                    comboBoxTransmogrify.Items.AddRange(wn);
+                    comboBoxTransmogrify.SelectedIndex = (eqpID >= 0 && eqpID < wn.Length) ? eqpID : 0;
+                }
+                this.eqpType = "Weapon";
+                eqpType = "Weapon";
+            }
 
             switch (eqpType)
             {
@@ -48,6 +63,9 @@ namespace MHXXSaveEditor.Forms
                     comboBoxTransmogrify.SelectedIndex = Array.IndexOf(GameConstants.PalicoArmorIDs, eqpID);
                     break;
             }
+
+            // Recherche évoluée (filtre en direct, Français / English), comme ailleurs dans l'éditeur.
+            ComboSearch.Attach(comboBoxTransmogrify, Util.RomfsConfig.L("Choose the transmogrification", "Choisir la transmogrification"));
         }
 
         private void ButtonSet_Click(object sender, EventArgs e)
@@ -75,6 +93,9 @@ namespace MHXXSaveEditor.Forms
                     break;
                 case "Palico Armor":
                     theID = BitConverter.GetBytes(GameConstants.PalicoArmorIDs[comboBoxTransmogrify.SelectedIndex]);
+                    break;
+                case "Weapon":
+                    theID = BitConverter.GetBytes(Math.Max(0, comboBoxTransmogrify.SelectedIndex));
                     break;
                 default:
                     theID = BitConverter.GetBytes(0);

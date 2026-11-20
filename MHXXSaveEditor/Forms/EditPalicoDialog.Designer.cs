@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabControl1 = new MHXXSaveEditor.Util.ThemedTabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.comboBoxSkillRNG = new System.Windows.Forms.ComboBox();
             this.comboBoxActionRNG = new System.Windows.Forms.ComboBox();
@@ -953,7 +953,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TabControl tabControl1;
+        private MHXXSaveEditor.Util.ThemedTabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox textBoxPreviousOwner;

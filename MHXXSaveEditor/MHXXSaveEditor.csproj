@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MHXXSaveEditor</RootNamespace>
-    <AssemblyName>MHXXSaveEditor</AssemblyName>
+    <AssemblyName>MHGUsaveEditorFrRw6</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -140,6 +140,27 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Data\NameCatalog.cs" />
+    <Compile Include="Forms\ChestView.cs" />
+    <Compile Include="Forms\ItemPickerDialog.cs" />
+    <Compile Include="Forms\NamePickerDialog.cs" />
+    <Compile Include="Forms\TransferSlotsDialog.cs" />
+    <Compile Include="Forms\BackupManagerDialog.cs" />
+    <Compile Include="Forms\MainForm.V2.cs" />
+    <Compile Include="Forms\MainForm.V2.Graphic.cs" />
+    <Compile Include="Forms\MainForm.V2.Backup.cs" />
+    <Compile Include="Forms\MainForm.V2.Destinations.cs" />
+    <Compile Include="Forms\MainForm.V2.Slots.cs" />
+    <Compile Include="Forms\MainForm.V2.Equipment.cs" />
+    <Compile Include="Forms\MainForm.V2.DragDrop.cs" />
+    <Compile Include="Forms\MainForm.V2.TopMenu.cs" />
+    <Compile Include="Util\GameAssets.cs" />
+    <Compile Include="Util\RomfsConfig.cs" />
+    <Compile Include="Util\BackupManager.cs" />
+    <Compile Include="Util\MenuChecks.cs" />
+    <Compile Include="Util\SafeFile.cs" />
+    <Compile Include="Util\RecentFilesMenu.cs" />
+    <Compile Include="Util\ThemeSettings.cs" />
     <Compile Include="Util\ColorBrightness.cs" />
     <Compile Include="Util\Loc.cs" />
     <Compile Include="Util\DataExtractor.cs" />
@@ -199,6 +220,7 @@
   <ItemGroup>
     <Content Include="icon.ico" />
     <None Include="Resources\CleanSave.txt" />
+    <None Include="Resources\EmptySlotMHGU.bin" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
