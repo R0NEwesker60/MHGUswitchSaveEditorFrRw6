@@ -180,6 +180,6 @@ Bugs and feedback: open an **issue** on this repository.
 <img width="1399" height="1437" alt="Capture d&#39;écran 2026-11-22 110253" src="https://github.com/user-attachments/assets/46ab3b56-04f7-442f-ac3c-af78485b9f6a" />
 <img width="1396" height="1437" alt="Capture d&#39;écran 2026-11-22 110405" src="https://github.com/user-attachments/assets/4b5b976d-a033-40df-9c18-1080df4c49ea" />
 <img width="999" height="393" alt="Capture d&#39;écran 2026-11-22 110418" src="https://github.com/user-attachments/assets/f79965d0-1691-4efc-a151-d14f3af0088b" />
-<img width="1163" height="835" alt="Capture d&#39;écran 2026-11-22 110427" src="https://github.com/user-attachments/assets/862f78ce-666e-4b2e-a845-77d765ee5aee" />
+<img width="1151" height="831" alt="Capture d&#39;écran 2026-11-22 110802" src="https://github.com/user-attachments/assets/063f707d-2598-41e5-ba95-20a5dd8d46b3" />
 <img width="143" height="47" alt="Capture d&#39;écran 2026-11-22 110347" src="https://github.com/user-attachments/assets/189b9cd1-7d88-4017-b2af-4e8a14a5e240" />
 <img width="250" height="97" alt="Capture d&#39;écran 2026-11-22 110352" src="https://github.com/user-attachments/assets/1e020155-06fd-483c-919c-546ea6f4c521" />
