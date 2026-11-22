@@ -4,7 +4,7 @@
 
 - **MHXXSaveEditor** – Copyright mineminemine – https://github.com/mineminemine/MHXXSaveEditor/ – GPL-3.0
 - **MHXXSwitchSaveEditor 420.69** – Dawnshifter – prise en charge des sauvegardes Switch – GPL-3.0
-- **Version française, V1 puis V2 (ce dépôt)** – Copyright (C) 2026 R0NEwesker60 (RW6) – GPL-3.0 – (https://github.com/R0NEwesker60/MHGUswitchSaveEditorFrRw6)
+- **Version française, V1 puis V2 (ce dépôt)** – Copyright (C) 2026 R0NEwesker60 (RW6) – GPL-3.0 – https://github.com/R0NEwesker60/MHGUswitchSaveEditorFrRw6
   - **fichiers ajoutés (V1 et V2)** :
     - `MHXXSaveEditor/Data/` : `FrenchNames.cs`, `NameCatalog.cs`
     - `MHXXSaveEditor/Util/` : `Loc.cs`, `GameAssets.cs`, `BackupManager.cs`, `RomfsConfig.cs`, `ThemeSettings.cs`, `SafeFile.cs`, `RecentFilesMenu.cs`, `MenuChecks.cs`, `AutoBackup.cs`, `FolderPicker.cs`, `ManualBackup.cs`

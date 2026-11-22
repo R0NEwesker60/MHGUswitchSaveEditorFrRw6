@@ -9,7 +9,7 @@ en français** (ou en anglais, au choix) et les **noms français officiels du je
 ⚠️ **Faites toujours une copie de votre fichier `system` avant de l'ouvrir.** Le programme fait lui-même une copie de sécurité
 avant chaque enregistrement, mais ce programme peut abîmer une sauvegarde (voir l'avertissement d'origine plus bas).
 
-## Nouveautés de la V2 (version décrite : V 02.54)
+## Nouveautés de la V2 (version décrite : V 02.55)
 
 **Coffres et recherche**
 - Trois **coffres graphiques** (objets, équipement, équipement Palico) avec les vraies icônes du jeu, en grille de 100 cases par page.
@@ -97,7 +97,7 @@ Save editor for **Monster Hunter Generations Ultimate (MHGU, Switch)**, with a *
 ⚠️ **Always make a copy of your `system` file before opening it.** The program makes its own safety copy before every save, but it can still
 damage a save (see the original warning).
 
-## What's new in V2 (version described: V 02.54)
+## What's new in V2 (version described: V 02.55)
 
 **Chests and search**
 - Three **graphic chests** (items, equipment, Palico equipment) with the game's real icons, in grids of 100 slots per page.
@@ -173,19 +173,3 @@ Licensed under the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE)
 **Unofficial** project, not affiliated with Capcom or Nintendo. *Monster Hunter* belongs to Capcom. This repository contains no game files, no save and no ROM.
 
 Bugs and feedback: open an **issue** on this repository.
-<img width="1406" height="1439" alt="Capture d&#39;écran 2026-11-22 080409" src="https://github.com/user-attachments/assets/83cccd8b-36c6-4b05-a799-be8700e26bc2" />
-<img width="1401" height="1433" alt="Capture d&#39;écran 2026-11-22 080410" src="https://github.com/user-attachments/assets/ef493a13-e734-4995-a886-0d1af68ea1a7" />
-<img width="1397" height="1438" alt="Capture d&#39;écran 2026-11-22 080414" src="https://github.com/user-attachments/assets/9d82d1ac-9323-4b2e-ba2c-e6c190cfc27e" />
-<img width="1398" height="1439" alt="Capture d&#39;écran 2026-11-22 080420" src="https://github.com/user-attachments/assets/5067192f-63fb-4da4-bd21-c855098e8a2e" />
-<img width="1395" height="1439" alt="Capture d&#39;écran 2026-11-22 080445" src="https://github.com/user-attachments/assets/dbcb45f1-bbd5-485b-81bd-7691d3ef5523" />
-<img width="478" height="496" alt="Capture d&#39;écran 2026-11-22 080458" src="https://github.com/user-attachments/assets/7b283770-3974-4af8-9872-256945ac1532" />
-<img width="1394" height="1437" alt="Capture d&#39;écran 2026-11-22 080509" src="https://github.com/user-attachments/assets/db9b256a-e86a-43a9-8b5d-96497e5561f2" />
-<img width="1403" height="1439" alt="Capture d&#39;écran 2026-11-22 080518" src="https://github.com/user-attachments/assets/7357d48b-a193-4beb-9814-b5caae098220" />
-<img width="1400" height="1439" alt="Capture d&#39;écran 2026-11-22 080541" src="https://github.com/user-attachments/assets/7aa4001d-4773-453d-b5ff-b9907af7c43e" />
-<img width="141" height="45" alt="Capture d&#39;écran 2026-11-22 080604" src="https://github.com/user-attachments/assets/9458995b-3560-42f7-b7df-7bd4d96cd033" />
-<img width="254" height="99" alt="Capture d&#39;écran 2026-11-22 080618" src="https://github.com/user-attachments/assets/b6237763-93b7-49ff-8cdf-14c00d725502" />
-<img width="1147" height="832" alt="Capture d&#39;écran 2026-11-22 082030" src="https://github.com/user-attachments/assets/a71c2bc1-8b8f-4fcd-93ae-34c9ae99b7c6" />
-
-
-
-

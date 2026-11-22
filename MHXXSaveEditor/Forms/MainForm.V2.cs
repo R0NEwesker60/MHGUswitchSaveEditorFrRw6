@@ -133,7 +133,7 @@ namespace MHXXSaveEditor
             lblIssueHint.ForeColor = Color.FromArgb(255, 230, 90);
             lblIssueHint.Cursor = Cursors.Hand;
             lblIssueHint.Visible = false;
-            lblIssueHint.Click += delegate { OpenUrl("https://github.com/R0NEwesker60/MHXXSaveEditor-FR/issues"); };
+            lblIssueHint.Click += delegate { OpenUrl("https://github.com/R0NEwesker60/MHGUswitchSaveEditorFrRw6/issues"); };
             Controls.Add(lblIssueHint);
 
             // Message jaune « interface graphique non activée » (onglet Général + onglets censés être graphiques).
@@ -343,8 +343,8 @@ namespace MHXXSaveEditor
             lblIssueHint.Visible = show;
             if (!show) return;
             lblIssueHint.Text = RomfsConfig.L(
-                "Found a bug or have feedback? Go to my GitHub page (R0NEwesker60/MHXXSaveEditor-FR) and open an \"issue\".",
-                "Un bug ou un retour à me faire ? Rendez-vous sur mon GitHub (R0NEwesker60/MHXXSaveEditor-FR) et créez une « issue ».");
+                "Found a bug or have feedback? Go to my GitHub page (R0NEwesker60/MHGUswitchSaveEditorFrRw6) and open an \"issue\".",
+                "Un bug ou un retour à me faire ? Rendez-vous sur mon GitHub (R0NEwesker60/MHGUswitchSaveEditorFrRw6) et créez une « issue ».");
             lblIssueHint.MaximumSize = new Size(Math.Max(200, ClientSize.Width / 2), 0);
             int pad = Math.Max(8, Font.Height);
             Point p = PointToClient(generalTab.PointToScreen(new Point(pad, generalTab.ClientSize.Height - lblIssueHint.Height - pad)));
@@ -823,7 +823,7 @@ namespace MHXXSaveEditor
                     if (MessageBox.Show(this,
                             RomfsConfig.L("Do you wish visit the RW6 Github page?", "Voulez-vous visiter la page GitHub RW6 ?"),
                             RomfsConfig.L("Visit Github", "Visiter GitHub"), MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
-                        OpenUrl("https://github.com/R0NEwesker60/MHXXSaveEditor-FR");
+                        OpenUrl("https://github.com/R0NEwesker60/MHGUswitchSaveEditorFrRw6");
                 };
                 help.DropDownItems.Add(rw6);
             }

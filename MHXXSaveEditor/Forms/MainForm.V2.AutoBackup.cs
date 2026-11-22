@@ -495,6 +495,48 @@ namespace MHXXSaveEditor
             ThemeSettings.Save();
         }
 
+        // ---- Titre de la fenêtre : le nom du programme à gauche, « Modifié et amélioré par : R0NEwesker60 » vers le milieu ----
+        string titleBase = "";
+
+        public override string Text
+        {
+            get { return base.Text; }
+            set
+            {
+                titleBase = value ?? "";
+                base.Text = BuildTitle(titleBase);
+            }
+        }
+
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            if (titleBase.Length > 0) base.Text = BuildTitle(titleBase);
+        }
+
+        // Windows écrit le titre collé à gauche : on ajoute des espaces (calculés d'après la largeur de la fenêtre) pour que la mention soit au milieu.
+        string BuildTitle(string t)
+        {
+            try
+            {
+                string credit = RomfsConfig.L("Modified and improved by: R0NEwesker60", "Modifié et amélioré par : R0NEwesker60");
+                Font f = SystemFonts.CaptionFont;
+                Size big = new Size(10000, 100);
+                TextFormatFlags fl = TextFormatFlags.NoPadding | TextFormatFlags.SingleLine;
+                int wLeft = TextRenderer.MeasureText(t, f, big, fl).Width;
+                int wCredit = TextRenderer.MeasureText(credit, f, big, fl).Width;
+                int wSpace = TextRenderer.MeasureText("a a", f, big, fl).Width - TextRenderer.MeasureText("aa", f, big, fl).Width;
+                if (wSpace < 2) wSpace = 3;
+                int start = (Width - wCredit) / 2;   // là où la mention doit commencer pour être centrée
+                int gap = start - 30 - wLeft;        // 30 = place de l'icône à gauche du titre
+                int spaces = gap / wSpace;
+                if (spaces < 4) spaces = 4;
+                if (spaces > 500) spaces = 500;
+                return t + new string(' ', spaces) + credit;
+            }
+            catch (Exception) { return t; }
+        }
+
         // ---- Menu Options : lancer au démarrage de Windows ----
 
         string StartupExePath
