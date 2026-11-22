@@ -69,6 +69,13 @@ namespace MHXXSaveEditor
             btnDestHelp.Visible = false;
             btnDestHelp.Click += delegate { ShowDestHelp(); };
             Controls.Add(btnDestHelp);
+            btnAutoHelp = new Button();
+            btnAutoHelp.AutoSize = true;
+            btnAutoHelp.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnAutoHelp.TabStop = false;
+            btnAutoHelp.Visible = false;
+            btnAutoHelp.Click += delegate { ShowAutoHelp(); };
+            Controls.Add(btnAutoHelp);
         }
 
         // Placement : au milieu du haut de l'onglet Général (les trois boutons d'emplacement sont à gauche), bouton d'aide à droite.
@@ -78,6 +85,7 @@ namespace MHXXSaveEditor
             bool show = tabControlMain.SelectedTab == generalTab;
             for (int i = 0; i < 3; i++) destButtons[i].Visible = show;
             btnDestHelp.Visible = show;
+            btnAutoHelp.Visible = show;
             if (!show) return;
 
             int pad = Math.Max(8, Font.Height);
@@ -114,6 +122,9 @@ namespace MHXXSaveEditor
             btnDestHelp.Text = RomfsConfig.L("Help: favorites and destinations", "Aide : favoris et destinations");
             btnDestHelp.Location = PointToClient(generalTab.PointToScreen(new Point(gs.Width - btnDestHelp.Width - pad, pad)));
             btnDestHelp.BringToFront();
+            btnAutoHelp.Text = RomfsConfig.L("Help: automatic backup", "Aide : sauvegarde automatique");
+            btnAutoHelp.Location = PointToClient(generalTab.PointToScreen(new Point(gs.Width - btnAutoHelp.Width - pad, pad + btnDestHelp.Height + gap)));
+            btnAutoHelp.BringToFront();
         }
 
         void DestLeftClick(int i)

@@ -3,8 +3,10 @@
 // Contenu : copie automatique du dossier de sauvegarde à la fermeture du jeu (icône dans la zone de notification),
 // et déchargement de la sauvegarde après « Enregistrer ».
 using MHXXSaveEditor.Data;
+using MHXXSaveEditor.Forms;
 using MHXXSaveEditor.Util;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -297,13 +299,97 @@ namespace MHXXSaveEditor
 
         // ---- Menu Sauvegarde de sécurité > Copie automatique (une seule ligne : elle ouvre une fenêtre de réglages) ----
 
+        // La copie automatique n'est plus dans le menu « Sauvegarde de sécurité » : elle a son propre bouton en haut (voir AddAutoCopyTopMenu).
         void BuildAutoBackupMenu(ToolStripMenuItem bk)
         {
-            bk.DropDownItems.Add(new ToolStripSeparator());
-            ToolStripMenuItem auto = new ToolStripMenuItem(RomfsConfig.L("Automatic copy when the game closes...", "Copie automatique à la fermeture du jeu..."));
-            auto.Click += delegate { ShowAutoCopyDialog(); };
-            bk.DropDownItems.Add(auto);
             InitAutoBackup();
+        }
+
+        // Bouton « Save auto » (en jaune) en haut, à côté de Options : ouvre directement les réglages de la copie automatique.
+        void AddAutoCopyTopMenu()
+        {
+            ToolStripMenuItem top = new ToolStripMenuItem(RomfsConfig.L("Auto save", "Save auto"));
+            top.Name = "menuAutoCopyTop";
+            top.ToolTipText = RomfsConfig.L("Automatic copy of the save folder when the game closes", "Copie automatique du dossier de sauvegarde quand le jeu se ferme");
+            top.Click += delegate { ShowAutoCopyDialog(); };
+            menuStripMain.Items.Add(top);
+        }
+
+        // Les onglets restent accessibles même sans sauvegarde chargée : seul leur contenu est grisé.
+        bool tabsLoaded;
+
+        // On ne grise plus les pages d'onglet en entier (une liste grisée devenait toute blanche en thème sombre) :
+        // on grise les champs et les boutons un par un, et les listes restent sombres (vides). L'état d'origine de chaque
+        // contrôle est mémorisé puis remis quand une sauvegarde est chargée.
+        readonly Dictionary<Control, bool> tabSaved = new Dictionary<Control, bool>();
+
+        void SetTabsEnabled(bool loaded)
+        {
+            tabsLoaded = loaded;
+            tabControlMain.Enabled = true; // sinon on ne peut plus changer d'onglet
+            foreach (TabPage p in tabControlMain.TabPages) p.Enabled = true;
+            if (loaded)
+            {
+                foreach (KeyValuePair<Control, bool> kv in tabSaved) kv.Key.Enabled = kv.Value;
+                tabSaved.Clear();
+            }
+            else
+            {
+                foreach (TabPage p in tabControlMain.TabPages) DisableControlsIn(p);
+            }
+            if (IsHandleCreated) UpdateLoadHint(); // au démarrage (fenêtre pas encore créée), la mise en page s'en charge
+        }
+
+        void DisableControlsIn(Control parent)
+        {
+            foreach (Control c in parent.Controls)
+            {
+                if (c is ListView) continue; // les listes restent en thème sombre
+                bool container = (c is GroupBox || c is Panel || c is TableLayoutPanel || c is FlowLayoutPanel) && !(c is ChestView);
+                if (container)
+                {
+                    DisableControlsIn(c);
+                    continue;
+                }
+                if (!tabSaved.ContainsKey(c))
+                {
+                    tabSaved[c] = c.Enabled;
+                    c.Enabled = false;
+                }
+            }
+        }
+
+        // Bouton « Aide : sauvegarde automatique » (onglet Général).
+        void ShowAutoHelp()
+        {
+            string text = RomfsConfig.L(
+                "AUTOMATIC BACKUP (copy of the save-0 folder)\n\n" +
+                "What it does: each time you close the game, the editor copies the whole save folder (save-0: saves, the game's backup, mods...) into a dated backup folder. If a save gets damaged, you can go back.\n\n" +
+                "To turn it on (once):\n" +
+                "1) Click \"Auto save\" at the top, next to \"Options\".\n" +
+                "2) Tick \"Turn on the automatic copy\".\n" +
+                "3) Choose the game's program (the .exe of MHGU Recomp), then the save-0 folder.\n\n" +
+                "After that it is automatic:\n" +
+                "- The copy is made 7 seconds after the game closes.\n" +
+                "- No copy if the game ran less than 15 seconds, or if nothing changed since the last copy.\n" +
+                "- 10 copies are kept by default (adjustable); the oldest are deleted.\n" +
+                "- If you close the editor's window with the cross, it stays in the notification area (crown icon) to watch the game. Right-click the icon > Quit to really stop it.\n" +
+                "- In the Options menu you can start the editor with Windows, with no window.\n\n" +
+                "For hand-made copies with notes and favorites, and to inject a copy back: Safety backup > Manual backups and injection.",
+                "SAUVEGARDE AUTOMATIQUE (copie du dossier save-0)\n\n" +
+                "À quoi ça sert : à chaque fois que tu fermes le jeu, l'éditeur copie tout le dossier de sauvegarde (save-0 : sauvegardes, backup du jeu, mods...) dans un dossier de copies datées. Si une sauvegarde est abîmée, tu peux revenir en arrière.\n\n" +
+                "Pour l'activer (une seule fois) :\n" +
+                "1) Clique sur « Save auto » en haut, à côté de « Options ».\n" +
+                "2) Coche « Activer la copie automatique ».\n" +
+                "3) Choisis le programme du jeu (le .exe de MHGU Recomp), puis le dossier save-0.\n\n" +
+                "Ensuite, c'est automatique :\n" +
+                "- La copie est faite 7 secondes après la fermeture du jeu.\n" +
+                "- Pas de copie si le jeu a tourné moins de 15 secondes, ni si rien n'a changé depuis la dernière copie.\n" +
+                "- 10 copies sont gardées par défaut (réglable) ; les plus anciennes sont supprimées.\n" +
+                "- Si tu fermes la fenêtre de l'éditeur avec la croix, il reste dans la zone de notification (icône couronne) pour surveiller le jeu. Clic droit sur l'icône > Quitter pour l'arrêter vraiment.\n" +
+                "- Dans le menu Options, tu peux lancer l'éditeur au démarrage de Windows, sans fenêtre.\n\n" +
+                "Pour des copies faites à la main avec notes et favoris, et pour réinjecter une copie : Sauvegarde de sécurité > Sauvegardes manuelles et injection.");
+            MessageBox.Show(this, text, RomfsConfig.L("Help: automatic backup", "Aide : sauvegarde automatique"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // Fenêtre de réglages : elle reste ouverte pendant qu'on change les réglages (plus besoin de refaire tout le chemin du menu).
@@ -707,7 +793,7 @@ namespace MHXXSaveEditor
                 editToolStripMenuItem.Enabled = false;
                 saveAsToolStripMenuItem.Enabled = false;
                 convertToolStripMenuItem.Enabled = false;
-                tabControlMain.Enabled = false;
+                SetTabsEnabled(false);
                 Text = Constants.EDITOR_VERSION;
                 UpdateSlotMenuTexts();
                 UpdateSlotButtons();

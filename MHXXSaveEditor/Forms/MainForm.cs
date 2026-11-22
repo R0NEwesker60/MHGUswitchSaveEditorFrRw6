@@ -155,7 +155,7 @@ namespace MHXXSaveEditor
             saveToolStripMenuItemSave.Enabled = true; // Enables the save toolstrip once save is loaded
             editToolStripMenuItem.Enabled = true;
             saveAsToolStripMenuItem.Enabled = true;
-            tabControlMain.Enabled = true;
+            SetTabsEnabled(true);
             convertToolStripMenuItem.Enabled = true;
 
             // Extract data from save file
@@ -269,6 +269,7 @@ namespace MHXXSaveEditor
                 "- Optional weapon transmogrification (cheat codes)\n" +
                 "- Automatic copy of the whole save folder (save-0) a few seconds after the game closes, in its own backup folder (10 copies by default, folder chosen with the Windows Explorer dialog; no copy if the game ran less than 15 seconds or if nothing changed since the last copy); the editor then stays in the notification area with a crown icon (right-click > Quit to stop it)\n" +
                 "- Manual backups of the save-0 folder (with notes and favorites: a favorite is never deleted; the limit can be turned off or changed), and injection of any copy (manual, automatic, transfer...) into save-0, with a Before injection folder to go back\n" +
+                "- Yellow Auto save button next to Options (automatic copy settings) and a Help: automatic backup button in the General tab; the tabs and the three character buttons stay visible, greyed, when no save is loaded\n" +
                 "- Optional start with Windows with no window (notification area only), with a button to change the program that is started; only one editor window at a time (starting it again brings the existing window back)\n" +
                 "- Options: unload the save after saving (on by default, and also when the window goes into the notification area), show or hide the Still running notification (off by default) and the automatic copy done notification (on by default)\n" +
                 "- Fixes for minor and major bugs\n\n" +
@@ -296,6 +297,7 @@ namespace MHXXSaveEditor
                 "- Transmogrification des armes en option (codes de triche)\n" +
                 "- Copie automatique de tout le dossier de sauvegarde (save-0) quelques secondes après la fermeture du jeu, dans son propre dossier de copies (10 copies par défaut, dossier choisi avec la boîte de l'Explorateur Windows ; pas de copie si le jeu a tourné moins de 15 secondes ou si rien n'a changé depuis la dernière copie) ; l'éditeur reste alors dans la zone de notification avec une icône couronne (clic droit > Quitter pour l'arrêter)\n" +
                 "- Sauvegardes manuelles du dossier save-0 (avec notes et favoris : un favori n\'est jamais supprimé ; la limite peut être désactivée ou changée), et injection de n\'importe quelle copie (manuelle, automatique, transfert...) dans save-0, avec un dossier Avant injection pour revenir en arrière\n" +
+                "- Bouton jaune Save auto à côté de Options (réglages de la copie automatique) et bouton Aide : sauvegarde automatique dans l\'onglet Général ; les onglets et les trois boutons de personnage restent visibles, grisés, quand aucune sauvegarde n\'est chargée\n" +
                 "- Lancement au démarrage de Windows en option, sans fenêtre (zone de notification seulement), avec un bouton pour changer le programme lancé ; une seule fenêtre de l'éditeur à la fois (relancer le programme réaffiche la fenêtre existante)\n" +
                 "- Options : décharger la sauvegarde après l'avoir enregistrée (activé par défaut, et aussi quand la fenêtre part dans la zone de notification), afficher ou masquer la notification Toujours actif (désactivée par défaut) et la notification de copie automatique faite (activée par défaut)\n" +
                 "- Corrections de bugs mineurs et majeurs\n\n" +
@@ -1433,7 +1435,7 @@ namespace MHXXSaveEditor
                 // Plus aucun personnage : on empêche d'enregistrer l'ancien contenu encore en mémoire par-dessus.
                 saveToolStripMenuItemSave.Enabled = false;
                 saveAsToolStripMenuItem.Enabled = false;
-                tabControlMain.Enabled = false;
+                SetTabsEnabled(false);
                 editToolStripMenuItem.Enabled = false;
             }
         }

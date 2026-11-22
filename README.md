@@ -9,7 +9,7 @@ en français** (ou en anglais, au choix) et les **noms français officiels du je
 ⚠️ **Faites toujours une copie de votre fichier `system` avant de l'ouvrir.** Le programme fait lui-même une copie de sécurité
 avant chaque enregistrement, mais ce programme peut abîmer une sauvegarde (voir l'avertissement d'origine plus bas).
 
-## Nouveautés de la V2 (version décrite : V 02.55)
+## Nouveautés de la V2 (version décrite : V 02.57)
 
 **Coffres et recherche**
 - Trois **coffres graphiques** (objets, équipement, équipement Palico) avec les vraies icônes du jeu, en grille de 100 cases par page.
@@ -32,6 +32,7 @@ avant chaque enregistrement, mais ce programme peut abîmer une sauvegarde (voir
 - **Déchargement de la sauvegarde après « Enregistrer »** (option, activée par défaut, et aussi quand la fenêtre part dans la zone de notification) : l'éditeur revient comme au démarrage, pour qu'une vieille version gardée ouverte n'écrase jamais la progression du jeu.
 - Choix des dossiers avec la **boîte de dialogue de l'Explorateur Windows** (accès rapide, recherche). Cinq dossiers de copies côte à côte (normales, transferts, automatiques, manuelles, avant injection), noms modifiables.
 - Couronnes de chasseur **redessinées d'après les captures du jeu**.
+- Bouton jaune **Save auto** en haut (réglages de la copie automatique) et bouton **Aide : sauvegarde automatique** dans l'onglet *Général*. Les onglets restent accessibles (grisés) quand aucune sauvegarde n'est chargée, et les trois boutons de personnage restent visibles, vides. Au premier lancement, ce sont les listes habituelles (la vue graphique des coffres s'active dans *Affichage*).
 
 **Personnages et fichiers**
 - **Gestion des emplacements** (MHGU Switch) : supprimer, échanger et dupliquer des personnages.
@@ -59,7 +60,7 @@ avant chaque enregistrement, mais ce programme peut abîmer une sauvegarde (voir
 3. Ouvrir `system` : *Fichier > Charger*, ou le **glisser sur la fenêtre**. Modifier, puis cliquer sur **Enregistrer**.
 4. Remettre `system` (et `system_backup`) à leur place et réimporter la sauvegarde. Ne pas renommer ces fichiers.
 
-*Copie automatique (facultatif)* : menu **Sauvegarde de sécurité > Copie automatique à la fermeture du jeu…**, cocher *Activer*, choisir le programme du jeu (`.exe`) puis le dossier `save-0`. Le reste est automatique. Pour des copies à la main, des notes, des favoris ou une injection : **Sauvegarde de sécurité > Sauvegardes manuelles et injection…**
+*Copie automatique (facultatif)* : bouton jaune **Save auto** (en haut, à côté de *Options*), cocher *Activer*, choisir le programme du jeu (`.exe`) puis le dossier `save-0`. Le reste est automatique. Pour des copies à la main, des notes, des favoris ou une injection : **Sauvegarde de sécurité > Sauvegardes manuelles et injection…**
 
 *Icônes du jeu (facultatif)* : sans dossier ROMFS, l'éditeur marche avec des listes. Pour les grilles à icônes, l'onglet **Général** affiche
 un message jaune « Interface graphique non activée » avec un bouton **Comment l'activer ?**, qui explique quel dossier choisir.
@@ -97,7 +98,7 @@ Save editor for **Monster Hunter Generations Ultimate (MHGU, Switch)**, with a *
 ⚠️ **Always make a copy of your `system` file before opening it.** The program makes its own safety copy before every save, but it can still
 damage a save (see the original warning).
 
-## What's new in V2 (version described: V 02.55)
+## What's new in V2 (version described: V 02.57)
 
 **Chests and search**
 - Three **graphic chests** (items, equipment, Palico equipment) with the game's real icons, in grids of 100 slots per page.
@@ -120,6 +121,7 @@ damage a save (see the original warning).
 - **Unloading the save after "Save"** (option, on by default, and also when the window goes into the notification area): the editor goes back to its start state, so an old version left open can never overwrite the game's progress.
 - Folders are chosen with the **Windows Explorer dialog** (quick access, search). Five backup folders side by side (normal, transfers, automatic, manual, before injection), names can be changed.
 - Hunter crowns **redrawn from game screenshots**.
+- Yellow **Auto save** button at the top (automatic copy settings) and a **Help: automatic backup** button in the *General* tab. Tabs stay reachable (greyed) when no save is loaded, and the three character buttons stay visible, empty. On first launch you get the usual lists (the graphic chest view is turned on in *View*).
 
 **Characters and files**
 - **Slot management** (MHGU Switch): delete, swap and duplicate characters.
@@ -147,7 +149,7 @@ damage a save (see the original warning).
 3. Open `system`: *File > Load*, or **drag it onto the window**. Edit, then click **Save**.
 4. Put `system` (and `system_backup`) back and re-import the save. Do not rename these files.
 
-*Automatic copy (optional)*: menu **Safety backup > Automatic copy when the game closes...**, tick *Turn on*, pick the game's program (`.exe`) then the `save-0` folder. The rest is automatic. For hand-made copies, notes, favorites or injection: **Safety backup > Manual backups and injection...**
+*Automatic copy (optional)*: yellow **Auto save** button (top, next to *Options*), tick *Turn on*, pick the game's program (`.exe`) then the `save-0` folder. The rest is automatic. For hand-made copies, notes, favorites or injection: **Safety backup > Manual backups and injection...**
 
 *Game icons (optional)*: without a ROMFS folder the editor works with lists. For the icon grids, the **General** tab shows a yellow
 "Graphic interface not enabled" message with a **How to turn it on?** button that explains which folder to pick.
@@ -173,14 +175,3 @@ Licensed under the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE)
 **Unofficial** project, not affiliated with Capcom or Nintendo. *Monster Hunter* belongs to Capcom. This repository contains no game files, no save and no ROM.
 
 Bugs and feedback: open an **issue** on this repository.
-<img width="1397" height="1438" alt="Capture d&#39;écran 2026-11-22 110224" src="https://github.com/user-attachments/assets/52e6d3a9-29ed-443e-8ed5-54cbe28d7bf9" />
-<img width="1400" height="1439" alt="Capture d&#39;écran 2026-11-22 110232" src="https://github.com/user-attachments/assets/1fc148b9-c49e-41f8-8206-e92dc0ba66b7" />
-<img width="1401" height="1438" alt="Capture d&#39;écran 2026-11-22 110239" src="https://github.com/user-attachments/assets/66ced316-e211-4dab-b449-305400373999" />
-<img width="1399" height="1439" alt="Capture d&#39;écran 2026-11-22 110249" src="https://github.com/user-attachments/assets/0c4864da-67bb-4ebf-b2cb-4bfc348bf342" />
-<img width="1399" height="1437" alt="Capture d&#39;écran 2026-11-22 110253" src="https://github.com/user-attachments/assets/46ab3b56-04f7-442f-ac3c-af78485b9f6a" />
-<img width="1396" height="1437" alt="Capture d&#39;écran 2026-11-22 110405" src="https://github.com/user-attachments/assets/4b5b976d-a033-40df-9c18-1080df4c49ea" />
-<img width="999" height="393" alt="Capture d&#39;écran 2026-11-22 110418" src="https://github.com/user-attachments/assets/f79965d0-1691-4efc-a151-d14f3af0088b" />
-<img width="1400" height="1434" alt="Capture d&#39;écran 2026-11-22 111021" src="https://github.com/user-attachments/assets/08c6fab6-134d-46f6-b2bd-711715de0c08" />
-<img width="1151" height="831" alt="Capture d&#39;écran 2026-11-22 110802" src="https://github.com/user-attachments/assets/063f707d-2598-41e5-ba95-20a5dd8d46b3" />
-<img width="143" height="47" alt="Capture d&#39;écran 2026-11-22 110347" src="https://github.com/user-attachments/assets/189b9cd1-7d88-4017-b2af-4e8a14a5e240" />
-<img width="250" height="97" alt="Capture d&#39;écran 2026-11-22 110352" src="https://github.com/user-attachments/assets/1e020155-06fd-483c-919c-546ea6f4c521" />

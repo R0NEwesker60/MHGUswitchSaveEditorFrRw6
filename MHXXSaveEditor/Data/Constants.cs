@@ -3,7 +3,7 @@
     class Constants
     {
         public const string EDITOR_NAME = "MHGUswitchSaveEditorFrRw6";
-        public const string EDITOR_VERSION_NUMBER = "02.55"; // 02 = V2 de l'application ; 55 = 55e mise à jour de cette version
+        public const string EDITOR_VERSION_NUMBER = "02.57"; // 02 = V2 de l'application ; 57 = 57e mise à jour de cette version
         public const string EDITOR_VERSION = EDITOR_NAME;    // titre de la fenêtre (la version est affichée à droite de la barre de menus)
 
         public const int SIZEOF_NAME = 32;

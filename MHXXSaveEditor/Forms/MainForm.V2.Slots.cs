@@ -314,7 +314,7 @@ namespace MHXXSaveEditor
                 if (used[i]) usedCount++;
                 text[i] = (i + 1).ToString() + " - " + (n ?? empty);
             }
-            bool show = tabControlMain.SelectedTab == generalTab && saveFile != null && usedCount > 0;
+            bool show = tabControlMain.SelectedTab == generalTab && (saveFile == null || usedCount > 0); // sans sauvegarde : trois boutons grisés « (vide) »
             for (int i = 0; i < 3; i++) slotButtons[i].Visible = show;
             if (!show) return;
 
@@ -325,6 +325,7 @@ namespace MHXXSaveEditor
             // place pour la couronne à droite du pseudo (sauvegardes MHGU Switch seulement)
             int crownRoom = (saveFile != null && saveFile.Length == MHGU_SAVE_SIZE - 36) ? (int)(Font.Height * 1.8f) : 0;
             w += Font.Height * 2 + crownRoom;
+            if (saveFile == null) w = Math.Max(w, Font.Height * 12);
             int h = (int)(Font.Height * 2.2f);
             Color accent = ThemeSettings.Dark ? Color.FromArgb(60, 110, 170) : SystemColors.Highlight;
             for (int i = 0; i < 3; i++)

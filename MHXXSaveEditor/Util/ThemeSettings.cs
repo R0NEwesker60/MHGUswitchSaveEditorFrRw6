@@ -14,7 +14,7 @@ namespace MHXXSaveEditor.Util
     static class ThemeSettings
     {
         public static bool Dark = false;
-        public static bool GraphicView = true;
+        public static bool GraphicView = false; // premier lancement : listes habituelles (la vue graphique s'active dans Affichage)
         // Icônes HD (pack de textures HD) : réglage et fichier .arc du pack choisi par la personne.
         public static bool HdIcons = false;
         public static string HdPath = "";
@@ -168,7 +168,7 @@ namespace MHXXSaveEditor.Util
                     string key = line.Substring(0, eq).Trim().ToLowerInvariant();
                     string val = line.Substring(eq + 1).Trim();
                     if (key == "dark") Dark = val == "1";
-                    else if (key == "graphic") GraphicView = val != "0";
+                    else if (key == "graphic") GraphicView = val == "1";
                     else if (key == "hd") HdIcons = val == "1";
                     else if (key == "hdpath") HdPath = val;
                     else if (key == "backup") BackupOn = val != "0";
@@ -414,6 +414,7 @@ namespace MHXXSaveEditor.Util
         // Couleur du texte d'un menu du haut (Fichier, Modifier...) ; « normal » pour tout le reste.
         static Color TopMenuColor(ToolStripItem item, Color normal)
         {
+            if (item != null && item.Name == "menuAutoCopyTop") return MenuColor(0); // « Save auto » : toujours en jaune, bien visible
             if (!ColorMenus || !(item is ToolStripMenuItem) || !(item.Owner is MenuStrip)) return normal;
             int k = 0;
             foreach (ToolStripItem it in item.Owner.Items)

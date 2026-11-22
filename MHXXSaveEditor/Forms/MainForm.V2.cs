@@ -81,6 +81,7 @@ namespace MHXXSaveEditor
         string detectedText = "";
         ToolStripMenuItem menuRankColors;
         Button[] destButtons;   // trois destinations (boutons raccourcis vers un fichier system), en haut de l'onglet Général
+        Button btnAutoHelp;     // 2e bouton d'aide (sauvegarde automatique), sous le premier
         Button btnDestHelp;     // bouton d'aide (en haut à droite de l'onglet Général)
         ToolStripMenuItem menuFavorites;
         ToolStripMenuItem menuBackupFolder2;
@@ -164,7 +165,7 @@ namespace MHXXSaveEditor
             lblDetected.BackColor = Color.Transparent;
             lblDetected.Visible = false;
             Controls.Add(lblDetected);
-            tabControlMain.EnabledChanged += delegate { UpdateLoadHint(); };
+            SetTabsEnabled(false); // au démarrage : le contenu des onglets est grisé, mais les onglets restent accessibles
             playerTab.SizeChanged += delegate { CenterGeneral(); };
             Activated += delegate { RefreshViews(); };
             Shown += delegate
@@ -317,7 +318,7 @@ namespace MHXXSaveEditor
             UpdateSlotButtons();
             UpdateDestButtons();
             UpdateDetectedLabel();
-            bool show = !tabControlMain.Enabled && tabControlMain.SelectedTab == generalTab;
+            bool show = !tabsLoaded && tabControlMain.SelectedTab == generalTab;
             lblLoadHint.Visible = show;
             if (!show) return;
             lblLoadHint.Font = new Font(Font.FontFamily, Font.Size * 1.6f, FontStyle.Bold);
@@ -876,6 +877,7 @@ namespace MHXXSaveEditor
             MenuChecks.Install(menuUnloadAfterSave);
             BuildStartupMenuItems(opt);
             menuStripMain.Items.Add(opt);
+            AddAutoCopyTopMenu(); // V56 : bouton « Save auto » à côté de Options
 
         }
 
