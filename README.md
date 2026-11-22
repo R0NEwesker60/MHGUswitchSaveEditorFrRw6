@@ -184,6 +184,7 @@ Bugs and feedback: open an **issue** on this repository.
 <img width="1400" height="1439" alt="Capture d&#39;écran 2026-11-22 080541" src="https://github.com/user-attachments/assets/7aa4001d-4773-453d-b5ff-b9907af7c43e" />
 <img width="141" height="45" alt="Capture d&#39;écran 2026-11-22 080604" src="https://github.com/user-attachments/assets/9458995b-3560-42f7-b7df-7bd4d96cd033" />
 <img width="254" height="99" alt="Capture d&#39;écran 2026-11-22 080618" src="https://github.com/user-attachments/assets/b6237763-93b7-49ff-8cdf-14c00d725502" />
+<img width="1147" height="832" alt="Capture d&#39;écran 2026-11-22 082030" src="https://github.com/user-attachments/assets/a71c2bc1-8b8f-4fcd-93ae-34c9ae99b7c6" />
 
 
 
