@@ -111,17 +111,36 @@ namespace MHXXSaveEditor
             restore.Click += delegate { RestoreBackup(); };
             bk.DropDownItems.Add(restore);
 
-            ToolStripMenuItem now = new ToolStripMenuItem(RomfsConfig.L("Copy the save file now (as saved on disk)", "Copier maintenant le fichier de sauvegarde (version enregistrée)"));
+            ToolStripMenuItem manual = new ToolStripMenuItem(RomfsConfig.L("Manual backups and injection...", "Sauvegardes manuelles et injection..."));
+            manual.Click += delegate { ShowManualBackupDialog(); };
+            bk.DropDownItems.Add(manual);
+            bk.DropDownItems.Add(new ToolStripSeparator());
+
+            ToolStripMenuItem now = new ToolStripMenuItem(RomfsConfig.L("Copy the save file now (currently in the editor)", "Copier maintenant le fichier de sauvegarde (actuellement dans l'éditeur)"));
             now.Click += delegate { BackupNow(); };
             bk.DropDownItems.Add(now);
 
-            ToolStripMenuItem open = new ToolStripMenuItem(RomfsConfig.L("Open the backup folder", "Ouvrir le dossier des copies"));
+            ToolStripMenuItem open = new ToolStripMenuItem(RomfsConfig.L("Open the safety copies folder", "Ouvrir le dossier des copies de sécurité"));
             open.Click += delegate { OpenBackupFolder(); };
             bk.DropDownItems.Add(open);
 
             ToolStripMenuItem openTr = new ToolStripMenuItem(RomfsConfig.L("Open the transfer copies folder", "Ouvrir le dossier des copies de transfert"));
             openTr.Click += delegate { OpenTransferBackupFolder(); };
             bk.DropDownItems.Add(openTr);
+
+            ToolStripMenuItem openAuto = new ToolStripMenuItem(RomfsConfig.L("Open the automatic copies folder", "Ouvrir le dossier des copies automatiques"));
+            openAuto.Click += delegate { OpenAutoFolder(); };
+            bk.DropDownItems.Add(openAuto);
+
+            ToolStripMenuItem openManual = new ToolStripMenuItem(RomfsConfig.L("Open the manual backups folder", "Ouvrir le dossier des sauvegardes manuelles"));
+            openManual.Click += delegate { OpenFolderSafe(ManualBackup.ManualFolder); };
+            bk.DropDownItems.Add(openManual);
+
+            ToolStripMenuItem openInject = new ToolStripMenuItem(RomfsConfig.L("Open the before-injection copies folder", "Ouvrir le dossier des copies avant injection"));
+            openInject.Click += delegate { OpenFolderSafe(ManualBackup.InjectFolder); };
+            bk.DropDownItems.Add(openInject);
+
+            BuildAutoBackupMenu(bk);
 
             bk.DropDownOpening += delegate { UpdateBackupMenuTexts(); };
             UpdateBackupMenuTexts();
@@ -143,7 +162,7 @@ namespace MHXXSaveEditor
                                        "Cliquez pour choisir le dossier qui contient les deux dossiers de copies : ") + BackupManager.Root;
             menuBackupFolder.ToolTipText = tip;
             menuBackupFolder2.ToolTipText = tip;
-            menuBackupMax.Text = RomfsConfig.L("Maximum number of copies: ", "Nombre maximum de copies : ") + ThemeSettings.BackupMax.ToString();
+            menuBackupMax.Text = RomfsConfig.L("Maximum number of safety copies: ", "Nombre maximum de copies de sécurité : ") + ThemeSettings.BackupMax.ToString();
         }
 
         // Nombre d'espaces à mettre devant une ligne de menu pour qu'elle commence sous la fin du texte « prefix ».
@@ -170,7 +189,21 @@ namespace MHXXSaveEditor
             if (a == null) return;
             string c = PromptText(title, RomfsConfig.L("Name of the folder for the transfer backups:", "Nom du dossier des copies de transfert :"), ThemeSettings.BackupTransferName);
             if (c == null) return;
-            if (!ValidFolderName(a) || !ValidFolderName(c) || string.Equals(a, c, StringComparison.OrdinalIgnoreCase))
+            string d = PromptText(title, RomfsConfig.L("Name of the folder for the automatic backups:", "Nom du dossier des copies automatiques :"), ThemeSettings.BackupAutoName);
+            if (d == null) return;
+            string e2 = PromptText(title, RomfsConfig.L("Name of the folder for the manual backups:", "Nom du dossier des sauvegardes manuelles :"), ThemeSettings.BackupManualName);
+            if (e2 == null) return;
+            string g = PromptText(title, RomfsConfig.L("Name of the folder for the before-injection copies:", "Nom du dossier des copies avant injection :"), ThemeSettings.BackupInjectName);
+            if (g == null) return;
+            bool namesOk = true;
+            string[] allNames = new string[] { a, c, d, e2, g };
+            for (int i = 0; i < allNames.Length && namesOk; i++)
+            {
+                if (!ValidFolderName(allNames[i])) namesOk = false;
+                for (int j = i + 1; j < allNames.Length && namesOk; j++)
+                    if (string.Equals(allNames[i], allNames[j], StringComparison.OrdinalIgnoreCase)) namesOk = false;
+            }
+            if (!namesOk)
             {
                 MessageBox.Show(this,
                     RomfsConfig.L("Each name must be filled in, different from the other, and without these characters: \\ / : * ? \" < > |",
@@ -180,11 +213,20 @@ namespace MHXXSaveEditor
             }
             string oldNormal = BackupManager.Folder;
             string oldTransfer = BackupManager.TransferFolder;
+            string oldAuto = AutoBackup.Folder;
+            string oldManual = ManualBackup.ManualFolder;
+            string oldInject = ManualBackup.InjectFolder;
             ThemeSettings.BackupNormalName = a;
             ThemeSettings.BackupTransferName = c;
+            ThemeSettings.BackupAutoName = d;
+            ThemeSettings.BackupManualName = e2;
+            ThemeSettings.BackupInjectName = g;
             ThemeSettings.Save();
             TryRenameFolder(oldNormal, BackupManager.Folder);
             TryRenameFolder(oldTransfer, BackupManager.TransferFolder);
+            TryRenameFolder(oldAuto, AutoBackup.Folder);
+            TryRenameFolder(oldManual, ManualBackup.ManualFolder);
+            TryRenameFolder(oldInject, ManualBackup.InjectFolder);
             UpdateBackupMenuTexts();
         }
 
@@ -208,8 +250,8 @@ namespace MHXXSaveEditor
         {
             using (FolderBrowserDialog dlg = new FolderBrowserDialog())
             {
-                dlg.Description = RomfsConfig.L("Choose the folder for the safety copies. The program creates two folders inside it: \"" + BackupManager.NormalSubFolder + "\" and \"" + BackupManager.TransferSubFolder + "\".",
-                                                "Choisissez le dossier des copies de sécurité. Le programme y crée deux dossiers : « " + BackupManager.NormalSubFolder + " » et « " + BackupManager.TransferSubFolder + " ».");
+                dlg.Description = RomfsConfig.L("Choose the folder for the safety copies. The program creates its backup folders inside it (for example \"" + BackupManager.NormalSubFolder + "\" and \"" + BackupManager.TransferSubFolder + "\").",
+                                                "Choisissez le dossier des copies de sécurité. Le programme y crée ses dossiers de copies (par exemple « " + BackupManager.NormalSubFolder + " » et « " + BackupManager.TransferSubFolder + " »).");
                 dlg.ShowNewFolderButton = true;
                 string cur = BackupManager.Root;
                 if (Directory.Exists(cur)) dlg.SelectedPath = cur;
@@ -250,6 +292,39 @@ namespace MHXXSaveEditor
                 MessageBox.Show(this,
                     RomfsConfig.L("Copy made:\n", "Copie créée :\n") + BackupManager.LastBackup,
                     RomfsConfig.L("Safety backup", "Sauvegarde de sécurité"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // Petite fenêtre : sauvegardes manuelles (notes, favoris) et injection d'une copie dans save-0.
+        void ShowManualBackupDialog()
+        {
+            using (ManualBackupDialog dlg = new ManualBackupDialog(Font, delegate (string target) { InjectedInto(target); }))
+                dlg.ShowDialog(this);
+        }
+
+        // Après une injection : si la sauvegarde ouverte dans l'éditeur est dans le dossier modifié, on la décharge (elle serait périmée).
+        void InjectedInto(string target)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(filePath) || string.IsNullOrEmpty(target)) return;
+                string full = Path.GetFullPath(filePath);
+                string t = Path.GetFullPath(target).TrimEnd('\\') + "\\";
+                if (full.StartsWith(t, StringComparison.OrdinalIgnoreCase)) UnloadSave();
+            }
+            catch (Exception) { }
+        }
+
+        void OpenFolderSafe(string dir)
+        {
+            try
+            {
+                Directory.CreateDirectory(dir);
+                System.Diagnostics.Process.Start(dir);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message, RomfsConfig.L("Safety backup", "Sauvegarde de sécurité"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         void OpenTransferBackupFolder()

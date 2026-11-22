@@ -149,6 +149,8 @@
     <Compile Include="Forms\MainForm.V2.cs" />
     <Compile Include="Forms\MainForm.V2.Graphic.cs" />
     <Compile Include="Forms\MainForm.V2.Backup.cs" />
+    <Compile Include="Forms\MainForm.V2.AutoBackup.cs" />
+    <Compile Include="Forms\ManualBackupDialog.cs" />
     <Compile Include="Forms\MainForm.V2.Destinations.cs" />
     <Compile Include="Forms\MainForm.V2.Slots.cs" />
     <Compile Include="Forms\MainForm.V2.Equipment.cs" />
@@ -157,6 +159,9 @@
     <Compile Include="Util\GameAssets.cs" />
     <Compile Include="Util\RomfsConfig.cs" />
     <Compile Include="Util\BackupManager.cs" />
+    <Compile Include="Util\AutoBackup.cs" />
+    <Compile Include="Util\FolderPicker.cs" />
+    <Compile Include="Util\ManualBackup.cs" />
     <Compile Include="Util\MenuChecks.cs" />
     <Compile Include="Util\SafeFile.cs" />
     <Compile Include="Util\RecentFilesMenu.cs" />

@@ -231,6 +231,7 @@ namespace MHXXSaveEditor
             SafeFile.WriteAllBytes(filePath, output);
             MarkClean();
             Loc.Show("File saved", "Saved !");
+            if (ThemeSettings.UnloadAfterSave && !keepLoadedAfterSave) UnloadSave(); // V42 : retour à l'état de démarrage
         }
 
         private byte[] TransformToSwitchFormat()
@@ -251,7 +252,7 @@ namespace MHXXSaveEditor
                 "Added in this version:\n" +
                 "- French and English interface, with the French names of MHGU\n" +
                 "- Three graphic chests (items, equipment, Palico equipment), with normal or HD icons\n" +
-                "- Optional HD icons (texture pack), read in place from your own ROMFS folder\n" +
+                "- Optional HD icons (texture pack), read in place from the folder you choose\n" +
                 "- Advanced search: by ID and by French and English names at the same time\n" +
                 "- Filters by category and by rarity\n" +
                 "- Dark theme, resizable window, adjustable zoom, colours on the menus and tabs (can be turned off)\n" +
@@ -263,8 +264,13 @@ namespace MHXXSaveEditor
                 "- Drag and drop a save file onto the window to open it\n" +
                 "- A Save button right next to File (same as File > Save), save format detection (3DS, MHXX Switch, MHGU Switch) shown on the General tab\n" +
                 "- Slot management: delete, swap and duplicate characters, slot buttons on the General tab (coloured by hunter rank)\n" +
+                "- Hunter crowns (EX monsters) shown next to the names on the slot buttons (display only)\n" +
                 "- Warning before losing unsaved changes, Ctrl+S / Ctrl+O shortcuts\n" +
                 "- Optional weapon transmogrification (cheat codes)\n" +
+                "- Automatic copy of the whole save folder (save-0) a few seconds after the game closes, in its own backup folder (10 copies by default, folder chosen with the Windows Explorer dialog; no copy if the game ran less than 15 seconds or if nothing changed since the last copy); the editor then stays in the notification area with a crown icon (right-click > Quit to stop it)\n" +
+                "- Manual backups of the save-0 folder (with notes and favorites: a favorite is never deleted; the limit can be turned off or changed), and injection of any copy (manual, automatic, transfer...) into save-0, with a Before injection folder to go back\n" +
+                "- Optional start with Windows with no window (notification area only), with a button to change the program that is started; only one editor window at a time (starting it again brings the existing window back)\n" +
+                "- Options: unload the save after saving (on by default, and also when the window goes into the notification area), show or hide the Still running notification (off by default) and the automatic copy done notification (on by default)\n" +
                 "- Fixes for minor and major bugs\n\n" +
                 "Licence: GNU GPL v3. Bugs and feedback: open an issue on the RW6 GitHub page.",
                 Constants.EDITOR_NAME + " V " + Constants.EDITOR_VERSION_NUMBER + " - version française améliorée de MHXXSaveEditor (V2)\n" +
@@ -273,7 +279,7 @@ namespace MHXXSaveEditor
                 "Ajouts de cette version :\n" +
                 "- Interface en français et en anglais, avec les noms français de MHGU\n" +
                 "- Trois coffres graphiques (objets, équipement, équipement Palico), avec icônes normales ou HD\n" +
-                "- Icônes HD en option (pack de textures), lues sur place dans ton propre dossier ROMFS\n" +
+                "- Icônes HD en option (pack de textures), lues sur place dans le dossier que tu choisis\n" +
                 "- Recherche avancée : par ID et par noms français et anglais en même temps\n" +
                 "- Filtres par catégorie et par rareté\n" +
                 "- Thème sombre, fenêtre redimensionnable, zoom réglable, couleurs sur les menus et les onglets (désactivables)\n" +
@@ -285,8 +291,13 @@ namespace MHXXSaveEditor
                 "- Glisser-déposer un fichier de sauvegarde sur la fenêtre pour l'ouvrir\n" +
                 "- Un bouton Enregistrer juste à droite de Fichier (comme Fichier > Enregistrer), format de la sauvegarde (3DS, MHXX Switch, MHGU Switch) affiché dans l'onglet Général\n" +
                 "- Gestion des emplacements : supprimer, échanger et dupliquer des personnages, boutons d'emplacement dans l'onglet Général (colorés selon le rang de chasseur)\n" +
+                "- Couronnes de chasseur (monstres EX) affichées à côté des pseudos sur les boutons d'emplacement (affichage seulement)\n" +
                 "- Avertissement avant de perdre des modifications non enregistrées, raccourcis Ctrl+S / Ctrl+O\n" +
                 "- Transmogrification des armes en option (codes de triche)\n" +
+                "- Copie automatique de tout le dossier de sauvegarde (save-0) quelques secondes après la fermeture du jeu, dans son propre dossier de copies (10 copies par défaut, dossier choisi avec la boîte de l'Explorateur Windows ; pas de copie si le jeu a tourné moins de 15 secondes ou si rien n'a changé depuis la dernière copie) ; l'éditeur reste alors dans la zone de notification avec une icône couronne (clic droit > Quitter pour l'arrêter)\n" +
+                "- Sauvegardes manuelles du dossier save-0 (avec notes et favoris : un favori n\'est jamais supprimé ; la limite peut être désactivée ou changée), et injection de n\'importe quelle copie (manuelle, automatique, transfert...) dans save-0, avec un dossier Avant injection pour revenir en arrière\n" +
+                "- Lancement au démarrage de Windows en option, sans fenêtre (zone de notification seulement), avec un bouton pour changer le programme lancé ; une seule fenêtre de l'éditeur à la fois (relancer le programme réaffiche la fenêtre existante)\n" +
+                "- Options : décharger la sauvegarde après l'avoir enregistrée (activé par défaut, et aussi quand la fenêtre part dans la zone de notification), afficher ou masquer la notification Toujours actif (désactivée par défaut) et la notification de copie automatique faite (activée par défaut)\n" +
                 "- Corrections de bugs mineurs et majeurs\n\n" +
                 "Licence : GNU GPL v3. Bugs et retours : créez une « issue » sur la page GitHub de RW6.");
             MessageBox.Show(this, text, MHXXSaveEditor.Util.RomfsConfig.L("About", "À propos"), MessageBoxButtons.OK, MessageBoxIcon.Information);

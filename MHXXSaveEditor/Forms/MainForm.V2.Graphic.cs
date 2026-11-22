@@ -143,7 +143,7 @@ namespace MHXXSaveEditor
                 "Files read in that folder (nothing is copied):\n" +
                 "- nativeNX\\table\\itemData.itm\n" +
                 "- the game's basic icons: nativeNX\\eng\\GUI\\99_texture\\HD_cmn_icon_GSM_NOMIP.tex (or the same file in the \"fre\" folder)\n\n" +
-                "Sharper icons (HD): if you have the HD texture pack (V4), put it in the same ROMFS folder (it brings nativeNX\\fre\\arc\\resident_fre.arc), then tick View > HD icons. Without the pack, the game's basic icons are used.\n\n" +
+                "Sharper icons (HD): if you have the HD texture pack (V4), tick View > HD icons. The program looks for it in your ROMFS folder; if it is somewhere else (for example a separate \"mods\" folder), it asks you once to choose the pack's folder: the \"romfs\" folder inside \"HD UI v4\" (for example mods\\HD UI v4\\romfs). Do NOT choose \"arc\" or any folder inside it (nativeNX, fre, arc): the program finds the right file by itself. To change it later: View > Change HD pack folder. Without the pack, the game's basic icons are used.\n\n" +
                 "If the files cannot be found, the program says so and shows the usual lists instead.",
                 "INTERFACE GRAPHIQUE (coffres en grille avec icônes)\n\n" +
                 "Pour l'activer :\n" +
@@ -152,7 +152,7 @@ namespace MHXXSaveEditor
                 "Fichiers lus dans ce dossier (rien n'est copié) :\n" +
                 "- nativeNX\\table\\itemData.itm\n" +
                 "- les icônes de base du jeu : nativeNX\\eng\\GUI\\99_texture\\HD_cmn_icon_GSM_NOMIP.tex (ou le même fichier dans le dossier « fre »)\n\n" +
-                "Icônes plus nettes (HD) : si vous avez le pack de textures HD (V4), mettez-le dans le même dossier ROMFS (il apporte nativeNX\\fre\\arc\\resident_fre.arc), puis cochez Affichage > Icônes HD. Sans le pack, ce sont les icônes de base du jeu qui sont utilisées.\n\n" +
+                "Icônes plus nettes (HD) : si vous avez le pack de textures HD (V4), cochez Affichage > Icônes HD. Le programme le cherche dans votre dossier ROMFS ; s'il est ailleurs (par exemple dans un dossier « mods » à part), il vous demande une seule fois de choisir le dossier du pack : le dossier « romfs » qui est dans « HD UI v4 » (par exemple mods\\HD UI v4\\romfs). Ne choisissez PAS « arc » ni un dossier à l'intérieur (nativeNX, fre, arc) : le programme trouve tout seul le bon fichier. Pour le changer plus tard : Affichage > Changer le dossier du pack HD. Sans le pack, ce sont les icônes de base du jeu qui sont utilisées.\n\n" +
                 "Si les fichiers sont introuvables, le programme le dit et affiche les listes habituelles à la place.");
             if (problem != null)
                 text += "\n\n" + RomfsConfig.L("Current problem: ", "Problème actuel : ") + problem;
@@ -263,22 +263,11 @@ namespace MHXXSaveEditor
             if (!GameAssets.EnableHd(null))
             {
                 MessageBox.Show(this,
-                    RomfsConfig.L("The HD texture pack was not found in the ROMFS folder.\n\nChoose the file \"resident_fre.arc\" of your HD pack (in \"nativeNX\\fre\\arc\").",
-                                  "Le pack de textures HD n'a pas été trouvé dans le dossier ROMFS.\n\nChoisissez le fichier « resident_fre.arc » de votre pack HD (dans « nativeNX\\fre\\arc »)."),
+                    RomfsConfig.L("The HD texture pack was not found in the ROMFS folder.\n\nChoose the \"romfs\" folder inside \"HD UI v4\" (for example mods\\HD UI v4\\romfs), not \"arc\". The program finds the right file by itself.",
+                                  "Le pack de textures HD n'a pas été trouvé dans le dossier ROMFS.\n\nChoisissez le dossier « romfs » qui est dans « HD UI v4 » (par exemple mods\\HD UI v4\\romfs), et pas « arc ». Le programme trouve tout seul le bon fichier."),
                     RomfsConfig.L("HD icons", "Icônes HD"), MessageBoxButtons.OK, MessageBoxIcon.Information);
-                string picked = null;
-                using (OpenFileDialog dlg = new OpenFileDialog())
+                if (!ChangeHdPackFolder())
                 {
-                    dlg.Title = RomfsConfig.L("HD pack: resident_fre.arc", "Pack HD : resident_fre.arc");
-                    dlg.Filter = "ARC (*.arc)|*.arc|" + RomfsConfig.L("All files", "Tous les fichiers") + " (*.*)|*.*";
-                    if (dlg.ShowDialog(this) == DialogResult.OK) picked = dlg.FileName;
-                }
-                if (picked == null || !GameAssets.EnableHd(picked))
-                {
-                    if (picked != null)
-                        MessageBox.Show(this,
-                            RomfsConfig.L("This file does not hold the HD icons: ", "Ce fichier ne contient pas les icônes HD : ") + GameAssets.HdError,
-                            RomfsConfig.L("HD icons", "Icônes HD"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     ThemeSettings.HdIcons = false;
                     ThemeSettings.Save();
                     SyncHdMenu();
@@ -325,6 +314,72 @@ namespace MHXXSaveEditor
             }
             ApplyGraphicMode();
             return true;
+        }
+
+        // V38 « Changer le dossier du pack HD... » : la personne choisit le dossier du pack (« romfs », ou « nativeNX » dedans),
+        // le bon fichier est trouvé tout seul. Si la personne annule ou si rien n'est trouvé, RIEN ne change. Retourne vrai si les icônes HD sont activées.
+        bool ChangeHdPackFolder()
+        {
+            if (!GameAssets.Loaded) EnsureGraphicReady();
+            if (!GameAssets.Loaded)
+            {
+                MessageBox.Show(this,
+                    RomfsConfig.L("Turn on the graphic chest view first (View menu), then choose the HD pack folder.",
+                                  "Activez d'abord la vue graphique des coffres (menu Affichage), puis choisissez le dossier du pack HD."),
+                    RomfsConfig.L("HD icons", "Icônes HD"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return false;
+            }
+            string folder;
+            using (FolderBrowserDialog dlg = new FolderBrowserDialog())
+            {
+                dlg.Description = RomfsConfig.L("Choose the \"romfs\" folder inside \"HD UI v4\" (for example mods\\HD UI v4\\romfs). Do not choose \"arc\". The program finds the right file by itself.",
+                                                "Choisissez le dossier « romfs » qui est dans « HD UI v4 » (par exemple mods\\HD UI v4\\romfs). Ne choisissez pas « arc ». Le programme trouve tout seul le bon fichier.");
+                try
+                {
+                    if (!string.IsNullOrEmpty(ThemeSettings.HdPath))
+                    {
+                        string d = Path.GetDirectoryName(ThemeSettings.HdPath);
+                        if (!string.IsNullOrEmpty(d) && Directory.Exists(d)) dlg.SelectedPath = d;
+                    }
+                }
+                catch (Exception) { }
+                if (dlg.ShowDialog(this) != DialogResult.OK) return false;
+                folder = dlg.SelectedPath;
+            }
+            string file = GameAssets.FindHdFileIn(folder);
+            if (file == null || !GameAssets.EnableHd(file))
+            {
+                MessageBox.Show(this,
+                    RomfsConfig.L("No HD icons were found in this folder.\n\nChoose the \"romfs\" folder inside \"HD UI v4\" (for example mods\\HD UI v4\\romfs), not \"arc\".",
+                                  "Aucune icône HD n'a été trouvée dans ce dossier.\n\nChoisissez le dossier « romfs » qui est dans « HD UI v4 » (par exemple mods\\HD UI v4\\romfs), et pas « arc »."),
+                    RomfsConfig.L("HD icons", "Icônes HD"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            ThemeSettings.HdIcons = true;
+            ThemeSettings.Save();
+            RefreshViews();
+            SyncHdMenu();
+            return true;
+        }
+
+        // V38 « Oublier le pack HD enregistré » : seulement si la personne le demande (et confirme).
+        void ForgetHdPack()
+        {
+            if (string.IsNullOrEmpty(ThemeSettings.HdPath) && !GameAssets.HdActive)
+            {
+                MessageBox.Show(this, RomfsConfig.L("No HD pack is saved.", "Aucun pack HD n'est enregistré."),
+                    RomfsConfig.L("HD icons", "Icônes HD"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (MessageBox.Show(this,
+                    RomfsConfig.L("Forget the saved HD pack? The game's basic icons will be used until you choose a pack again.",
+                                  "Oublier le pack HD enregistré ? Les icônes de base du jeu seront utilisées jusqu'à ce que vous choisissiez de nouveau un pack."),
+                    RomfsConfig.L("HD icons", "Icônes HD"), MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            GameAssets.ForgetHd();
+            ThemeSettings.HdIcons = false;
+            ThemeSettings.Save();
+            RefreshViews();
+            SyncHdMenu();
         }
 
         // « Oublier le dossier ROMFS enregistré » : seulement si la personne le demande (et confirme).

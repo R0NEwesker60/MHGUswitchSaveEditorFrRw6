@@ -26,6 +26,25 @@ namespace MHXXSaveEditor.Util
         public static bool WarnUnsaved = true;
         public static string BackupDir = "";
         public static int BackupMax = 10;
+        // Copie automatique du dossier de sauvegarde (save-0) quelques secondes après la fermeture du jeu (désactivée par défaut, 10 copies).
+        public static bool AutoOn = false;
+        public static string AutoExe = "";   // nom du programme du jeu, sans « .exe »
+        public static string AutoDir = "";   // dossier à copier (save-0)
+        public static int AutoMax = 10;
+        // Après « Enregistrer », l'éditeur décharge la sauvegarde (comme au démarrage) : activé par défaut.
+        public static bool UnloadAfterSave = true;
+        // Programme lancé au démarrage de Windows (vide = le programme en cours).
+        public static string StartupExe = "";
+        // Notification « Toujours actif » quand la fenêtre se réduit dans la zone de notification (désactivée par défaut).
+        public static bool TrayNotice = false;
+        // Notification « copie automatique faite » (activée par défaut).
+        public static bool CopyNotice = true;
+        // Sauvegardes manuelles du dossier save-0 (dossier choisi une fois, puis mémorisé ; sert aussi de cible pour l'injection).
+        public static string ManualDir = "";
+        public static bool ManualLimitOn = true;   // limite du nombre de sauvegardes manuelles (les favoris ne comptent pas et ne sont jamais supprimés)
+        public static int ManualMax = 10;
+        public static HashSet<string> ManualFavs = new HashSet<string>(StringComparer.OrdinalIgnoreCase); // noms des copies manuelles en favori
+        public static int InjectMax = 10;          // copies « avant injection » gardées
         // Noms des deux dossiers de copies créés dans le dossier choisi. Par défaut, selon la langue :
         // « Copies normales » / « Copies de transfert » ou « Normal backups » / « Transfer backups ».
         // Pour les réglages créés avant la version 33, on garde les anciens noms (« Save avant edit »...).
@@ -50,6 +69,51 @@ namespace MHXXSaveEditor.Util
                 return backupTransferRaw;
             }
             set { backupTransferRaw = value; }
+        }
+        static string backupManualRaw;
+        public static string BackupManualName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(backupManualRaw))
+                {
+                    backupManualRaw = string.Equals(BackupNormalName, "Save avant edit", StringComparison.OrdinalIgnoreCase)
+                        ? "Save avant edit - Manuelles"
+                        : RomfsConfig.L("Manual backups", "Sauvegardes manuelles");
+                }
+                return backupManualRaw;
+            }
+            set { backupManualRaw = value; }
+        }
+        static string backupInjectRaw;
+        public static string BackupInjectName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(backupInjectRaw))
+                {
+                    backupInjectRaw = string.Equals(BackupNormalName, "Save avant edit", StringComparison.OrdinalIgnoreCase)
+                        ? "Save avant edit - Avant injection"
+                        : RomfsConfig.L("Before injection", "Avant injection");
+                }
+                return backupInjectRaw;
+            }
+            set { backupInjectRaw = value; }
+        }
+        static string backupAutoRaw;
+        public static string BackupAutoName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(backupAutoRaw))
+                {
+                    backupAutoRaw = string.Equals(BackupNormalName, "Save avant edit", StringComparison.OrdinalIgnoreCase)
+                        ? "Save avant edit - Automatiques"
+                        : RomfsConfig.L("Automatic backups", "Copies automatiques");
+                }
+                return backupAutoRaw;
+            }
+            set { backupAutoRaw = value; }
         }
         // Couleurs différentes pour chaque menu du haut et chaque onglet (activé par défaut).
         public static bool ColorMenus = true;
@@ -114,6 +178,39 @@ namespace MHXXSaveEditor.Util
                     else if (key == "backuplayout") int.TryParse(val, out BackupLayout);
                     else if (key == "backupnormalname") backupNormalRaw = val;
                     else if (key == "backuptransfername") backupTransferRaw = val;
+                    else if (key == "backupautoname") backupAutoRaw = val;
+                    else if (key == "autoon") AutoOn = val == "1";
+                    else if (key == "autoexe") AutoExe = val;
+                    else if (key == "autodir") AutoDir = val;
+                    else if (key == "startupexe") StartupExe = val;
+                    else if (key == "traynotice") TrayNotice = val == "1";
+                    else if (key == "copynotice") CopyNotice = val != "0";
+                    else if (key == "backupmanualname") backupManualRaw = val;
+                    else if (key == "backupinjectname") backupInjectRaw = val;
+                    else if (key == "manualdir") ManualDir = val;
+                    else if (key == "manuallimiton") ManualLimitOn = val != "0";
+                    else if (key == "manualfavs")
+                    {
+                        ManualFavs.Clear();
+                        foreach (string fv in val.Split('|'))
+                            if (fv.Trim().Length > 0) ManualFavs.Add(fv.Trim());
+                    }
+                    else if (key == "manualmax")
+                    {
+                        int mmx;
+                        if (int.TryParse(val, out mmx) && mmx >= 1 && mmx <= 500) ManualMax = mmx;
+                    }
+                    else if (key == "injectmax")
+                    {
+                        int imx;
+                        if (int.TryParse(val, out imx) && imx >= 1 && imx <= 500) InjectMax = imx;
+                    }
+                    else if (key == "unloadaftersave") UnloadAfterSave = val != "0";
+                    else if (key == "automax")
+                    {
+                        int amx;
+                        if (int.TryParse(val, out amx) && amx >= 1 && amx <= 500) AutoMax = amx;
+                    }
                     else if (key == "backupmax")
                     {
                         int bmx;
@@ -381,6 +478,22 @@ namespace MHXXSaveEditor.Util
                     "backuplayout=" + BackupLayout.ToString(),
                     "backupnormalname=" + BackupNormalName,
                     "backuptransfername=" + BackupTransferName,
+                    "backupautoname=" + BackupAutoName,
+                    "autoon=" + (AutoOn ? "1" : "0"),
+                    "autoexe=" + (AutoExe ?? ""),
+                    "autodir=" + (AutoDir ?? ""),
+                    "startupexe=" + (StartupExe ?? ""),
+                    "traynotice=" + (TrayNotice ? "1" : "0"),
+                    "copynotice=" + (CopyNotice ? "1" : "0"),
+                    "backupmanualname=" + BackupManualName,
+                    "backupinjectname=" + BackupInjectName,
+                    "manualdir=" + (ManualDir ?? ""),
+                    "manuallimiton=" + (ManualLimitOn ? "1" : "0"),
+                    "manualfavs=" + string.Join("|", ManualFavs),
+                    "manualmax=" + ManualMax.ToString(),
+                    "injectmax=" + InjectMax.ToString(),
+                    "automax=" + AutoMax.ToString(),
+                    "unloadaftersave=" + (UnloadAfterSave ? "1" : "0"),
                     "colormenus=" + (ColorMenus ? "1" : "0"),
                     "colorranks=" + (ColorRanks ? "1" : "0"),
                     "zoom=" + Zoom.ToString(),

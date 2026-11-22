@@ -7,6 +7,7 @@ using MHXXSaveEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -114,6 +115,171 @@ namespace MHXXSaveEditor
             }
         }
 
+        // V39 : nombre de monstres EX (Déviants) DIFFÉRENTS terminés par le personnage d'un emplacement (sauvegardes MHGU Switch) ; -1 si inconnu.
+        // La liste est de 24 cases (une par monstre EX, 18 utilisées), à l'octet 0x3191 de l'emplacement. Trouvé en comparant des sauvegardes
+        // avant / après, et paliers vérifiés en jeu : 1 monstre = petite couronne, 10 = couronne moyenne, 18 = couronne maximale.
+        int SlotExCount(int slot)
+        {
+            try
+            {
+                if (saveFile == null || saveFile.Length != MHGU_SAVE_SIZE - 36 || saveFile[3 + slot] != 1) return -1;
+                int off = BitConverter.ToInt32(saveFile, 0x10 + 4 * (slot - 1));
+                int p = off + 0x3191;
+                if (off < 0 || p + 3 > saveFile.Length) return -1;
+                int bits = (saveFile[p] | (saveFile[p + 1] << 8) | (saveFile[p + 2] << 16)) & 0x3FFFF;
+                int n = 0;
+                while (bits != 0) { n += bits & 1; bits >>= 1; }
+                return n;
+            }
+            catch (Exception) { return -1; }
+        }
+
+        // 0 = pas de couronne, 1 = petite, 2 = moyenne, 3 = maximale.
+        static int CrownLevel(int exCount)
+        {
+            if (exCount >= 18) return 3;
+            if (exCount >= 10) return 2;
+            if (exCount >= 1) return 1;
+            return 0;
+        }
+
+        static string CrownName(int level)
+        {
+            if (level == 3) return RomfsConfig.L("maximum crown", "couronne maximale");
+            if (level == 2) return RomfsConfig.L("medium crown", "couronne moyenne");
+            return RomfsConfig.L("small crown", "petite couronne");
+        }
+
+        // Dessine la couronne à droite du pseudo, sur le bouton d'emplacement (le niveau est dans b.Tag).
+        void SlotButton_Paint(object sender, PaintEventArgs e)
+        {
+            Button b = (Button)sender;
+            if (!(b.Tag is int)) return;
+            int level = (int)b.Tag;
+            if (level <= 0) return;
+            int size = (int)(b.Height * 0.55f);
+            int pad = Math.Max(6, b.Height / 6);
+            DrawCrownIcon(e.Graphics, new Rectangle(b.Width - size - pad, (b.Height - size) / 2, size, size), level);
+        }
+
+        // Couronnes dessinées par le programme (ce ne sont pas les images du jeu), refaites d'après les captures du jeu :
+        // 1 = bulbe jaune avec losange rouge, 2 = couronne dorée à gemme bleue et collerette blanche, 3 = cœur rouge, arcs dorés, gemme rose et quatre étoiles.
+        static RectangleF CU(Rectangle r, float x, float y, float w, float h)
+        {
+            return new RectangleF(r.X + r.Width * x, r.Y + r.Height * y, r.Width * w, r.Height * h);
+        }
+
+        static PointF[] CP(Rectangle r, params float[] xy)
+        {
+            PointF[] p = new PointF[xy.Length / 2];
+            for (int i = 0; i < p.Length; i++) p[i] = new PointF(r.X + r.Width * xy[2 * i], r.Y + r.Height * xy[2 * i + 1]);
+            return p;
+        }
+
+        static void CFillEllipse(Graphics g, RectangleF e, Color fill, float pw)
+        {
+            using (Brush br = new SolidBrush(fill)) g.FillEllipse(br, e);
+            using (Pen pe = new Pen(Color.Black, pw)) g.DrawEllipse(pe, e);
+        }
+
+        static void CFillPoly(Graphics g, PointF[] pts, Color fill, Color edge, float pw)
+        {
+            using (Brush br = new SolidBrush(fill)) g.FillPolygon(br, pts);
+            using (Pen pe = new Pen(edge, pw)) { pe.LineJoin = LineJoin.Round; g.DrawPolygon(pe, pts); }
+        }
+
+        static void CFillRoundRect(Graphics g, RectangleF e, float rad, Color fill, float pw)
+        {
+            using (GraphicsPath gp = new GraphicsPath())
+            {
+                float d = rad * 2f;
+                gp.AddArc(e.X, e.Y, d, d, 180, 90);
+                gp.AddArc(e.Right - d, e.Y, d, d, 270, 90);
+                gp.AddArc(e.Right - d, e.Bottom - d, d, d, 0, 90);
+                gp.AddArc(e.X, e.Bottom - d, d, d, 90, 90);
+                gp.CloseFigure();
+                using (Brush br = new SolidBrush(fill)) g.FillPath(br, gp);
+                using (Pen pe = new Pen(Color.Black, pw)) { pe.LineJoin = LineJoin.Round; g.DrawPath(pe, gp); }
+            }
+        }
+
+        static void CStar(Graphics g, Rectangle r, float cx, float cy, float rad, float pw)
+        {
+            PointF[] pts = new PointF[8];
+            for (int i = 0; i < 8; i++)
+            {
+                double a = -Math.PI / 2 + i * Math.PI / 4;
+                float rr = (i % 2 == 0) ? rad : rad * 0.32f;
+                pts[i] = new PointF(r.X + r.Width * cx + (float)Math.Cos(a) * r.Width * rr, r.Y + r.Height * cy + (float)Math.Sin(a) * r.Width * rr);
+            }
+            CFillPoly(g, pts, Color.FromArgb(255, 215, 50), Color.Black, pw);
+            using (Brush wh = new SolidBrush(Color.FromArgb(255, 250, 220)))
+                g.FillEllipse(wh, r.X + r.Width * cx - r.Width * rad * 0.18f, r.Y + r.Height * cy - r.Width * rad * 0.18f, r.Width * rad * 0.36f, r.Width * rad * 0.36f);
+        }
+
+        static void DrawCrownIcon(Graphics g, Rectangle r, int level)
+        {
+            SmoothingMode old = g.SmoothingMode;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            float pw = Math.Max(1f, r.Width * 0.06f);
+            Color gold = Color.FromArgb(252, 200, 30);
+            Color darkGold = Color.FromArgb(185, 125, 20);
+            Color white = Color.FromArgb(245, 248, 252);
+            if (level == 1)
+            {
+                // collerette bleu clair, bulbe jaune, losange rouge, petite perle blanche
+                CFillRoundRect(g, CU(r, 0.24f, 0.72f, 0.52f, 0.24f), r.Width * 0.04f, Color.FromArgb(190, 220, 245), pw);
+                CFillEllipse(g, CU(r, 0.03f, 0.16f, 0.94f, 0.68f), gold, pw);
+                using (Brush shade = new SolidBrush(Color.FromArgb(235, 170, 20)))
+                    g.FillPie(shade, CU(r, 0.12f, 0.30f, 0.76f, 0.50f).X, CU(r, 0.12f, 0.30f, 0.76f, 0.50f).Y, CU(r, 0.12f, 0.30f, 0.76f, 0.50f).Width, CU(r, 0.12f, 0.30f, 0.76f, 0.50f).Height, 20, 140);
+                CFillPoly(g, CP(r, 0.5f, 0.30f, 0.66f, 0.48f, 0.5f, 0.66f, 0.34f, 0.48f), Color.FromArgb(235, 25, 30), Color.FromArgb(150, 10, 20), Math.Max(1f, pw * 0.5f));
+                CFillEllipse(g, CU(r, 0.43f, 0.03f, 0.14f, 0.14f), white, Math.Max(1f, pw * 0.8f));
+            }
+            else if (level == 2)
+            {
+                // collerette blanche à quatre dents, deux pétales, grand dôme doré, gemme bleue, bouton doré
+                CFillRoundRect(g, CU(r, 0.20f, 0.74f, 0.60f, 0.12f), r.Width * 0.02f, white, pw);
+                for (int k = 0; k < 4; k++)
+                    CFillRoundRect(g, CU(r, 0.22f + k * 0.15f, 0.82f, 0.11f, 0.15f), r.Width * 0.03f, white, pw);
+                CFillEllipse(g, CU(r, 0.02f, 0.28f, 0.32f, 0.52f), gold, pw);
+                CFillEllipse(g, CU(r, 0.66f, 0.28f, 0.32f, 0.52f), gold, pw);
+                CFillRoundRect(g, CU(r, 0.44f, 0.02f, 0.12f, 0.20f), r.Width * 0.05f, gold, pw);
+                CFillEllipse(g, CU(r, 0.20f, 0.12f, 0.60f, 0.70f), gold, pw);
+                using (Pen ring = new Pen(darkGold, Math.Max(1f, pw * 0.8f)))
+                {
+                    RectangleF e = CU(r, 0.27f, 0.20f, 0.46f, 0.58f);
+                    g.DrawEllipse(ring, e);
+                }
+                CFillPoly(g, CP(r, 0.5f, 0.28f, 0.60f, 0.38f, 0.60f, 0.54f, 0.5f, 0.64f, 0.40f, 0.54f, 0.40f, 0.38f), Color.FromArgb(40, 215, 240), Color.Black, Math.Max(1f, pw * 0.7f));
+            }
+            else
+            {
+                // cœur rouge, deux arcs dorés, flèche dorée, gemme rose, barre dorée, quatre étoiles
+                CFillEllipse(g, CU(r, 0.06f, 0.24f, 0.88f, 0.60f), Color.FromArgb(215, 20, 25), pw);
+                CFillRoundRect(g, CU(r, 0.26f, 0.22f, 0.48f, 0.56f), r.Width * 0.12f, Color.FromArgb(235, 30, 35), pw);
+                RectangleF bar = CU(r, 0.22f, 0.86f, 0.56f, 0.10f);
+                using (Brush br = new SolidBrush(gold)) g.FillRectangle(br, bar);
+                using (Pen pe = new Pen(Color.Black, pw)) g.DrawRectangle(pe, bar.X, bar.Y, bar.Width, bar.Height);
+                using (Pen under = new Pen(Color.Black, r.Width * 0.16f))
+                using (Pen arm = new Pen(gold, r.Width * 0.09f))
+                {
+                    under.StartCap = under.EndCap = LineCap.Round;
+                    arm.StartCap = arm.EndCap = LineCap.Round;
+                    PointF[] left = CP(r, 0.20f, 0.30f, 0.30f, 0.62f, 0.40f, 0.84f);
+                    PointF[] right = CP(r, 0.80f, 0.30f, 0.70f, 0.62f, 0.60f, 0.84f);
+                    g.DrawCurve(under, left); g.DrawCurve(under, right);
+                    g.DrawCurve(arm, left); g.DrawCurve(arm, right);
+                }
+                CFillPoly(g, CP(r, 0.5f, 0.02f, 0.60f, 0.18f, 0.54f, 0.18f, 0.54f, 0.40f, 0.46f, 0.40f, 0.46f, 0.18f, 0.40f, 0.18f), gold, Color.Black, pw);
+                CFillPoly(g, CP(r, 0.5f, 0.42f, 0.60f, 0.52f, 0.60f, 0.66f, 0.5f, 0.76f, 0.40f, 0.66f, 0.40f, 0.52f), Color.FromArgb(240, 150, 190), Color.FromArgb(120, 20, 80), Math.Max(1f, pw * 0.9f));
+                CStar(g, r, 0.14f, 0.16f, 0.15f, pw * 0.8f);
+                CStar(g, r, 0.86f, 0.16f, 0.15f, pw * 0.8f);
+                CStar(g, r, 0.12f, 0.86f, 0.14f, pw * 0.8f);
+                CStar(g, r, 0.88f, 0.86f, 0.14f, pw * 0.8f);
+            }
+            g.SmoothingMode = old;
+        }
+
         // Les trois boutons d'emplacement, en haut à gauche de l'onglet Général : « 1 - Pseudo », « 2 - (vide) », « 3 - Pseudo ».
         void CreateSlotButtons()
         {
@@ -128,6 +294,7 @@ namespace MHXXSaveEditor
                 b.TabStop = false;
                 b.Visible = false;
                 b.Click += delegate { SwitchToSlot(n); };
+                b.Paint += SlotButton_Paint;
                 Controls.Add(b);
                 slotButtons[i] = b;
             }
@@ -155,7 +322,9 @@ namespace MHXXSaveEditor
             int gap = Math.Max(4, Font.Height / 3);
             int w = 0;
             for (int i = 0; i < 3; i++) w = Math.Max(w, TextRenderer.MeasureText(text[i], Font).Width);
-            w += Font.Height * 2;
+            // place pour la couronne à droite du pseudo (sauvegardes MHGU Switch seulement)
+            int crownRoom = (saveFile != null && saveFile.Length == MHGU_SAVE_SIZE - 36) ? (int)(Font.Height * 1.8f) : 0;
+            w += Font.Height * 2 + crownRoom;
             int h = (int)(Font.Height * 2.2f);
             Color accent = ThemeSettings.Dark ? Color.FromArgb(60, 110, 170) : SystemColors.Highlight;
             for (int i = 0; i < 3; i++)
@@ -172,7 +341,14 @@ namespace MHXXSaveEditor
                 b.BackColor = selected ? selBack : ThemeSettings.Field;
                 b.ForeColor = selected ? Color.White : (used[i] ? ThemeSettings.FieldFore : Color.Gray);
                 if (byRank) b.ForeColor = ThemeSettings.RankColor(rank);
-                gfxTip.SetToolTip(b, used[i] ? RomfsConfig.L("Hunter rank: ", "Rang de chasseur (RC) : ") + rank.ToString() : "");
+                int exCount = used[i] ? SlotExCount(i + 1) : -1;
+                int crown = CrownLevel(exCount);
+                b.Tag = crown;
+                b.Invalidate();
+                string tip = used[i] ? RomfsConfig.L("Hunter rank: ", "Rang de chasseur (RC) : ") + rank.ToString() : "";
+                if (used[i] && exCount > 0)
+                    tip += "\n" + RomfsConfig.L("EX monsters: ", "Monstres EX : ") + exCount.ToString() + " (" + CrownName(crown) + ")";
+                gfxTip.SetToolTip(b, tip);
                 b.FlatAppearance.BorderColor = selected ? accent : (ThemeSettings.Dark ? Color.FromArgb(90, 92, 104) : SystemColors.ControlDark);
                 b.FlatAppearance.MouseOverBackColor = selected ? accent : (ThemeSettings.Dark ? Color.FromArgb(70, 72, 84) : SystemColors.ControlLight);
                 b.Location = PointToClient(generalTab.PointToScreen(new Point(pad, pad + i * (h + gap))));

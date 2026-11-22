@@ -427,6 +427,53 @@ namespace MHXXSaveEditor.Util
             }
         }
 
+        // V38 : cherche, dans un dossier choisi par la personne (le dossier du pack HD, ou un dossier au-dessus),
+        // le fichier .arc qui contient les icônes HD. Le chemin exact dans le pack n'a pas besoin d'être connu :
+        // on regarde tous les fichiers « resident*.arc » du dossier et de ses sous-dossiers.
+        public static string FindHdFileIn(string folder)
+        {
+            if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) return null;
+            List<string> files = new List<string>();
+            CollectResidentArcs(folder, 0, files);
+            files.Sort(delegate (string x, string y) { return HdFileRank(x).CompareTo(HdFileRank(y)); });
+            foreach (string f in files)
+            {
+                if (ReadHdAtlas(f) != null) return f;
+            }
+            return null;
+        }
+
+        static int HdFileRank(string file)
+        {
+            string n = Path.GetFileName(file).ToLowerInvariant();
+            if (n == "resident_fre.arc") return 0;
+            if (n.StartsWith("resident_fre")) return 1;
+            return 2;
+        }
+
+        static void CollectResidentArcs(string dir, int depth, List<string> files)
+        {
+            if (depth > 8) return;
+            try
+            {
+                foreach (string f in Directory.GetFiles(dir, "resident*.arc")) files.Add(f);
+            }
+            catch (Exception) { }
+            try
+            {
+                foreach (string d in Directory.GetDirectories(dir)) CollectResidentArcs(d, depth + 1, files);
+            }
+            catch (Exception) { }
+        }
+
+        // Oublie le pack HD : retour aux icônes d'origine, et le fichier mémorisé est effacé.
+        public static void ForgetHd()
+        {
+            atlasHD = null;
+            ThemeSettings.HdPath = "";
+            if (Loaded) UseAtlas(false);
+        }
+
         // Sort un fichier d'une archive .arc (format MT Framework : 12 octets d'en-tête, puis 80 octets par fichier :
         // nom sur 64 octets, type, taille compressée, taille d'origine, position ; données compressées en zlib).
         static byte[] ExtractFromArc(byte[] d, string nameEnd)

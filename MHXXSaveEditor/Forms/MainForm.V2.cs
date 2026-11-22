@@ -94,6 +94,7 @@ namespace MHXXSaveEditor
         void AddV2Menus()
         {
             ThemeSettings.Load();
+            FormClosing += AutoTrayClosing; // V42 : la croix réduit la fenêtre dans la zone de notification si la copie automatique est active
             FormClosing += delegate { RememberWindowBounds(); };
             FormClosing += delegate (object sender, FormClosingEventArgs e)
             {
@@ -639,6 +640,14 @@ namespace MHXXSaveEditor
             view.DropDownItems.Add(new ToolStripSeparator());
             view.DropDownItems.Add(romfs);
             view.DropDownItems.Add(menuForgetRomfs);
+            ToolStripMenuItem hdPack = new ToolStripMenuItem(RomfsConfig.L("Change HD pack folder...", "Changer le dossier du pack HD..."));
+            hdPack.Click += delegate { ChangeHdPackFolder(); };
+            ToolStripMenuItem forgetHd = new ToolStripMenuItem(RomfsConfig.L("Forget the saved HD pack", "Oublier le pack HD enregistré"));
+            forgetHd.ToolTipText = RomfsConfig.L("Only if you want to unregister the HD pack. \"Change HD pack folder...\" keeps the current one when you cancel.",
+                                                 "Seulement si vous voulez désenregistrer le pack HD. « Changer le dossier du pack HD... » garde l'actuel si vous annulez.");
+            forgetHd.Click += delegate { ForgetHdPack(); };
+            view.DropDownItems.Add(hdPack);
+            view.DropDownItems.Add(forgetHd);
 
             menuStripMain.Items.Add(view);
             BuildBackupMenu();
@@ -791,7 +800,9 @@ namespace MHXXSaveEditor
             if (r == DialogResult.Cancel) return false;
             if (r == DialogResult.Yes)
             {
-                SaveToolStripMenuItemSave_Click(this, EventArgs.Empty);
+                keepLoadedAfterSave = true; // ici on continue avec la sauvegarde ouverte : pas de déchargement
+                try { SaveToolStripMenuItemSave_Click(this, EventArgs.Empty); }
+                finally { keepLoadedAfterSave = false; }
                 if (HasUnsavedChanges()) return false; // l'enregistrement n'a pas abouti : on ne perd rien
             }
             return true;
@@ -850,6 +861,20 @@ namespace MHXXSaveEditor
             };
             opt.DropDownItems.Add(menuWarnUnsaved);
             MenuChecks.Install(menuWarnUnsaved);
+
+            menuUnloadAfterSave = new ToolStripMenuItem(RomfsConfig.L("Unload the save after saving", "Décharger la sauvegarde après l'avoir enregistrée"));
+            menuUnloadAfterSave.CheckOnClick = true;
+            menuUnloadAfterSave.Checked = ThemeSettings.UnloadAfterSave;
+            menuUnloadAfterSave.ToolTipText = RomfsConfig.L("After Save, the editor goes back to its start state (no save open), so an old copy kept open cannot overwrite what you did in the game. Load the save again to keep editing.",
+                                                            "Après Enregistrer, l'éditeur revient comme au démarrage (aucune sauvegarde ouverte) : une vieille version gardée ouverte ne peut pas écraser ce que vous avez fait dans le jeu. Rechargez la sauvegarde pour continuer à modifier.");
+            menuUnloadAfterSave.Click += delegate
+            {
+                ThemeSettings.UnloadAfterSave = menuUnloadAfterSave.Checked;
+                ThemeSettings.Save();
+            };
+            opt.DropDownItems.Add(menuUnloadAfterSave);
+            MenuChecks.Install(menuUnloadAfterSave);
+            BuildStartupMenuItems(opt);
             menuStripMain.Items.Add(opt);
 
         }
