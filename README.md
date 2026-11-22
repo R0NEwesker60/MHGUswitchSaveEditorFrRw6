@@ -173,3 +173,13 @@ Licensed under the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE)
 **Unofficial** project, not affiliated with Capcom or Nintendo. *Monster Hunter* belongs to Capcom. This repository contains no game files, no save and no ROM.
 
 Bugs and feedback: open an **issue** on this repository.
+<img width="1397" height="1438" alt="Capture d&#39;écran 2026-11-22 110224" src="https://github.com/user-attachments/assets/52e6d3a9-29ed-443e-8ed5-54cbe28d7bf9" />
+<img width="1400" height="1439" alt="Capture d&#39;écran 2026-11-22 110232" src="https://github.com/user-attachments/assets/1fc148b9-c49e-41f8-8206-e92dc0ba66b7" />
+<img width="1401" height="1438" alt="Capture d&#39;écran 2026-11-22 110239" src="https://github.com/user-attachments/assets/66ced316-e211-4dab-b449-305400373999" />
+<img width="1399" height="1439" alt="Capture d&#39;écran 2026-11-22 110249" src="https://github.com/user-attachments/assets/0c4864da-67bb-4ebf-b2cb-4bfc348bf342" />
+<img width="1399" height="1437" alt="Capture d&#39;écran 2026-11-22 110253" src="https://github.com/user-attachments/assets/46ab3b56-04f7-442f-ac3c-af78485b9f6a" />
+<img width="1396" height="1437" alt="Capture d&#39;écran 2026-11-22 110405" src="https://github.com/user-attachments/assets/4b5b976d-a033-40df-9c18-1080df4c49ea" />
+<img width="999" height="393" alt="Capture d&#39;écran 2026-11-22 110418" src="https://github.com/user-attachments/assets/f79965d0-1691-4efc-a151-d14f3af0088b" />
+<img width="1163" height="835" alt="Capture d&#39;écran 2026-11-22 110427" src="https://github.com/user-attachments/assets/862f78ce-666e-4b2e-a845-77d765ee5aee" />
+<img width="143" height="47" alt="Capture d&#39;écran 2026-11-22 110347" src="https://github.com/user-attachments/assets/189b9cd1-7d88-4017-b2af-4e8a14a5e240" />
+<img width="250" height="97" alt="Capture d&#39;écran 2026-11-22 110352" src="https://github.com/user-attachments/assets/1e020155-06fd-483c-919c-546ea6f4c521" />
