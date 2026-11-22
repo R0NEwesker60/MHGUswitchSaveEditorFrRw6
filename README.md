@@ -173,3 +173,14 @@ Licensed under the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE)
 **Unofficial** project, not affiliated with Capcom or Nintendo. *Monster Hunter* belongs to Capcom. This repository contains no game files, no save and no ROM.
 
 Bugs and feedback: open an **issue** on this repository.
+<img width="254" height="99" alt="Capture d&#39;écran 2026-11-22 080618" src="https://github.com/user-attachments/assets/3efa9c1d-bbb3-4764-aab9-a37596dcc9e0" />
+<img width="141" height="45" alt="Capture d&#39;écran 2026-11-22 080604" src="https://github.com/user-attachments/assets/b27920b8-bcd8-4951-9f10-a8faaad66998" />
+<img width="1400" height="1439" alt="Capture d&#39;écran 2026-11-22 080541" src="https://github.com/user-attachments/assets/6bc9351f-f846-4d37-a0ff-3ba2b8021e46" />
+<img width="1403" height="1439" alt="Capture d&#39;écran 2026-11-22 080518" src="https://github.com/user-attachments/assets/4f9b6f27-bf8e-48b2-97c0-fd3019895385" />
+<img width="1394" height="1437" alt="Capture d&#39;écran 2026-11-22 080509" src="https://github.com/user-attachments/assets/9c3421f1-f770-444f-bc7e-72f303b80f91" />
+<img width="478" height="496" alt="Capture d&#39;écran 2026-11-22 080458" src="https://github.com/user-attachments/assets/397a38b1-ac1a-4896-bd72-d40d66bbfe2a" />
+<img width="1395" height="1439" alt="Capture d&#39;écran 2026-11-22 080445" src="https://github.com/user-attachments/assets/0fd6b420-11e0-46cc-93eb-432e2e8226ed" />
+<img width="1398" height="1439" alt="Capture d&#39;écran 2026-11-22 080420" src="https://github.com/user-attachments/assets/46f38f40-01e9-41a1-a26e-fb044a37dc4b" />
+<img width="1397" height="1438" alt="Capture d&#39;écran 2026-11-22 080414" src="https://github.com/user-attachments/assets/7afa00bd-4e04-4389-92a6-38c8c0dcfdc4" />
+<img width="1401" height="1433" alt="Capture d&#39;écran 2026-11-22 080410" src="https://github.com/user-attachments/assets/631569ac-d851-4a97-9e1b-fd1ec44c02c1" />
+<img width="1406" height="1439" alt="Capture d&#39;écran 2026-11-22 080410 (2)" src="https://github.com/user-attachments/assets/84768ef0-33b8-485d-a664-596bddd64703" />
