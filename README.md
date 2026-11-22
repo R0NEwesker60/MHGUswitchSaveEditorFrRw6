@@ -173,15 +173,16 @@ Licensed under the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE)
 **Unofficial** project, not affiliated with Capcom or Nintendo. *Monster Hunter* belongs to Capcom. This repository contains no game files, no save and no ROM.
 
 Bugs and feedback: open an **issue** on this repository.
-<img width="254" height="99" alt="Capture d&#39;écran 2026-11-22 080618" src="https://github.com/user-attachments/assets/31df419d-4f2a-40d8-82a1-2ba00d707cc9" />
-<img width="141" height="45" alt="Capture d&#39;écran 2026-11-22 080604" src="https://github.com/user-attachments/assets/85482b23-f65e-4b82-8898-5753b418bf3c" />
-<img width="1400" height="1439" alt="Capture d&#39;écran 2026-11-22 080541" src="https://github.com/user-attachments/assets/b9c7143c-5568-4d4e-b74a-c9ddbc2acd52" />
-<img width="1403" height="1439" alt="Capture d&#39;écran 2026-11-22 080518" src="https://github.com/user-attachments/assets/2fd3f6eb-8270-4e65-960b-bd4809c6b2da" />
-<img width="1394" height="1437" alt="Capture d&#39;écran 2026-11-22 080509" src="https://github.com/user-attachments/assets/d26d93ea-4956-4d26-aaee-329b4f4fd4b0" />
-<img width="478" height="496" alt="Capture d&#39;écran 2026-11-22 080458" src="https://github.com/user-attachments/assets/86435c7b-48ef-4608-8775-6957839e1dc4" />
-<img width="1395" height="1439" alt="Capture d&#39;écran 2026-11-22 080445" src="https://github.com/user-attachments/assets/d51c0739-32c3-4585-a8a0-71b177fe139a" />
-<img width="1398" height="1439" alt="Capture d&#39;écran 2026-11-22 080420" src="https://github.com/user-attachments/assets/5d509605-98f6-49ab-969d-1e68ecc357cf" />
-<img width="1397" height="1438" alt="Capture d&#39;écran 2026-11-22 080414" src="https://github.com/user-attachments/assets/2d5f7155-05f8-4931-83e4-53816191e74e" />
-<img width="1401" height="1433" alt="Capture d&#39;écran 2026-11-22 080410" src="https://github.com/user-attachments/assets/f330b0db-6ebb-4ac1-8e99-0068dc477051" />
-<img width="1406" height="1439" alt="Capture d&#39;écran 2026-11-22 080409" src="https://github.com/user-attachments/assets/51713aa0-6fe3-47d5-9638-e3e09aa92aa6" />
+<img width="254" height="99" alt="Capture d&#39;écran 2026-11-22 080618" src="https://github.com/user-attachments/assets/28b70ccf-8b85-4bc7-9228-dbd05016be87" />
+<img width="141" height="45" alt="Capture d&#39;écran 2026-11-22 080604" src="https://github.com/user-attachments/assets/c8890573-b90c-4a56-966b-9914bec989d5" />
+<img width="1400" height="1439" alt="Capture d&#39;écran 2026-11-22 080541" src="https://github.com/user-attachments/assets/8a07751b-18d1-4a1b-8f76-0e413b1c306d" />
+<img width="1403" height="1439" alt="Capture d&#39;écran 2026-11-22 080518" src="https://github.com/user-attachments/assets/a8ab204f-70d8-4098-81b6-6c0b8812ca96" />
+<img width="1394" height="1437" alt="Capture d&#39;écran 2026-11-22 080509" src="https://github.com/user-attachments/assets/30937848-57ad-4b4f-acbc-573dfd6335b9" />
+<img width="478" height="496" alt="Capture d&#39;écran 2026-11-22 080458" src="https://github.com/user-attachments/assets/b72fbbaa-3f81-44a5-88af-aab88d582795" />
+<img width="1395" height="1439" alt="Capture d&#39;écran 2026-11-22 080445" src="https://github.com/user-attachments/assets/9338980c-1154-4c7a-8f73-df9a2ccf5a90" />
+<img width="1398" height="1439" alt="Capture d&#39;écran 2026-11-22 080420" src="https://github.com/user-attachments/assets/058d93c2-f764-45bb-99ff-7580983079eb" />
+<img width="1397" height="1438" alt="Capture d&#39;écran 2026-11-22 080414" src="https://github.com/user-attachments/assets/73dbf0f0-66c2-4fcb-9e67-495112da6033" />
+<img width="1401" height="1433" alt="Capture d&#39;écran 2026-11-22 080410" src="https://github.com/user-attachments/assets/b60a99fc-5bf6-410c-85cc-e5da2b2c296f" />
+<img width="1406" height="1439" alt="Capture d&#39;écran 2026-11-22 080409" src="https://github.com/user-attachments/assets/031c1604-b659-4899-9916-c966ba4bb522" />
+
 
