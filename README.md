@@ -173,3 +173,7 @@ Licensed under the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE)
 **Unofficial** project, not affiliated with Capcom or Nintendo. *Monster Hunter* belongs to Capcom. This repository contains no game files, no save and no ROM.
 
 Bugs and feedback: open an **issue** on this repository.
+<img width="1398" height="1438" alt="Capture d&#39;écran 2026-11-23 093130" src="https://github.com/user-attachments/assets/01a67581-df65-4a58-a3b5-3c6144ed7baf" />
+<img width="1383" height="1439" alt="Capture d&#39;écran 2026-11-23 093237" src="https://github.com/user-attachments/assets/28f62771-5d6a-46fa-81a5-109a649f7d60" />
+<img width="1393" height="1439" alt="Capture d&#39;écran 2026-11-23 093253" src="https://github.com/user-attachments/assets/2afd462a-ef1a-42b6-aba2-57f2138e0d54" />
+<img width="1394" height="1439" alt="Capture d&#39;écran 2026-11-23 093539" src="https://github.com/user-attachments/assets/d81cafeb-d7bb-47fc-99b6-d0c2c821db5e" />
