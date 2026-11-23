@@ -48,8 +48,7 @@ avant chaque enregistrement, mais ce programme peut abîmer une sauvegarde (voir
 - Menu **Language / Langue** (le programme redémarre pour appliquer la langue).
 
 **Ce qui n'est pas là (pour l'instant)**
-- L'**édition** des couronnes de chasseur (monstres EX) : elles sont seulement affichées pour l'instant.
-- La **conversion entre MHXX (3DS) et MHGU (Switch)** : elle n'existe pas dans cet éditeur.
+- Le **support des fonctions MHXX** (3DS et Switch) héritées de l'éditeur d'origine : elles sont laissées pour ceux qui veulent les essayer, mais elles ne sont plus maintenues et je ne corrige pas les bugs qui les concernent. Pour MHXX, vous pouvez consulter l'éditeur d'origine de [mineminemine](https://github.com/mineminemine/MHXXSaveEditor/).
 - Les couleurs du rang de chasseur viennent de seuils non vérifiés dans le jeu.
 - La copie automatique, la zone de notification et le lancement au démarrage fonctionnent sous **Windows** (version PC) ; les copies automatiques et l'injection n'agissent que sur le dossier que vous choisissez.
 
@@ -137,8 +136,7 @@ damage a save (see the original warning).
 - **Language / Langue** menu (the program restarts to apply the language).
 
 **Not there (yet)**
-- **Editing** hunter crowns (EX monsters): for now they are only displayed.
-- **Conversion between MHXX (3DS) and MHGU (Switch)**: not available in this editor.
+- **Support for the MHXX functions** (3DS and Switch) inherited from the original editor: they are left in for anyone who wants to try them, but they are no longer maintained and I do not fix bugs related to them. For MHXX, you can check the original editor by [mineminemine](https://github.com/mineminemine/MHXXSaveEditor/).
 - Hunter-rank colours come from thresholds that have not been verified in the game.
 - Automatic copy, the notification area and start with Windows work on **Windows** (PC version); automatic copies and injection only act on the folder you choose.
 
